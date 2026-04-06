@@ -10,5 +10,6 @@
       "label": "Backend (FastAPI)",
       "onAutoForward": "notify"
     }
-  }
+  },
+  "postStartCommand": "bash /workspaces/Jarvis/start.sh"
 }
