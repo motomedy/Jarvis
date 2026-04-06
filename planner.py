@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-import anthropic
+# import anthropic  # LLM features disabled
 
 from templates import TEMPLATES, get_template
 
