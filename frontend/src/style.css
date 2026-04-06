@@ -4,20 +4,27 @@
   box-sizing: border-box;
 }
 
+
 html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  min-height: 100vh;
   background: #050508;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #orb-canvas {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  touch-action: none;
+  z-index: 1;
 }
 
 #status-text {
@@ -56,6 +63,41 @@ html, body {
   display: flex;
   gap: 8px;
   z-index: 20;
+}
+
+@media (max-width: 600px) {
+  #controls {
+    top: 8px;
+    right: 8px;
+    gap: 4px;
+  }
+  #controls button {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+  #status-text {
+    font-size: 11px;
+    bottom: 24px;
+  }
+  #jarvis-label {
+    font-size: 8px;
+    bottom: 6px;
+  }
+  .settings-panel {
+    width: 100vw;
+    min-width: 0;
+    max-width: 100vw;
+    border-left: none;
+    border-top: 1px solid rgba(0, 212, 255, 0.12);
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 70vh;
+    max-height: 90vh;
+    border-radius: 12px 12px 0 0;
+  }
 }
 
 #controls button {

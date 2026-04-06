@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   server: {
     port: 5173,
+    host: true, // Listen on all interfaces (0.0.0.0)
     proxy: {
       "/ws": {
         target: "https://localhost:8340",

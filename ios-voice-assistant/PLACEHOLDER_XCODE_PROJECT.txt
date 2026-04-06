@@ -1,0 +1,5 @@
+// This is a placeholder for the Xcode project file.
+// To complete the setup, open Xcode and create a new SwiftUI App project in this folder.
+// Add the provided Swift files, Info.plist, and .gitignore to the project.
+// Set the bundle identifier and signing settings as needed for your Apple Developer account.
+// For a fully automated setup, use Xcode or a compatible CLI tool to generate the .xcodeproj structure.

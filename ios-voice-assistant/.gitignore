@@ -1,0 +1,17 @@
+# .gitignore for iOS Swift project
+.DS_Store
+build/
+DerivedData/
+*.xcworkspace
+xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.swp
+*.lock
+*.xcuserdatad
+*.orig
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xcscmblueprint

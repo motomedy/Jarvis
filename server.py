@@ -35,7 +35,36 @@ from typing import Optional
 import httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import File, UploadFile
+# ---------------------------------------------------------------------------
+# Speech-to-Text (Fish Audio API)
+# ---------------------------------------------------------------------------
+
+@app.post("/api/speech-to-text")
+async def api_speech_to_text(file: UploadFile = File(...)):
+    """Accepts an audio file and returns the transcript using Fish Audio API."""
+    if not FISH_API_KEY:
+        return JSONResponse(status_code=500, content={"error": "Fish Audio API key not set"})
+    try:
+        audio_bytes = await file.read()
+        headers = {
+            "Authorization": f"Bearer {FISH_API_KEY}",
+        }
+        files = {
+            "file": (file.filename, audio_bytes, file.content_type or "audio/wav"),
+        }
+        # Use default model/language
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post("https://api.fish.audio/v1/stt", headers=headers, files=files)
+            if resp.status_code == 200:
+                data = resp.json()
+                return {"transcript": data.get("text", "")}
+            else:
+                return JSONResponse(status_code=502, content={"error": f"Fish Audio error: {resp.text}"})
+    except Exception as e:
+        log.error(f"Speech-to-text failed: {e}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
 from pydantic import BaseModel
 
 from actions import execute_action, monitor_build, open_terminal, open_browser, open_claude_in_project, _generate_project_name, prompt_existing_terminal
