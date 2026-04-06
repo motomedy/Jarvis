@@ -1,0 +1,19 @@
+
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+	- File created and tracked in .github.
+- [x] Clarify Project Requirements
+	- Python rapid prototyping project for TikTok API integration.
+- [x] Scaffold the Project
+	- README.md, .gitignore, main.py, requirements.txt scaffolded.
+- [x] Customize the Project
+	- Placeholder for TikTok API integration added in main.py.
+- [x] Install Required Extensions
+	- No additional extensions required.
+- [x] Compile the Project
+	- Virtual environment created and dependencies installed.
+- [x] Create and Run Task
+	- VS Code task created to run main.py.
+- [x] Launch the Project
+	- main.py runs successfully and prints startup message.
+- [x] Ensure Documentation is Complete
+	- README.md and copilot-instructions.md are up to date.

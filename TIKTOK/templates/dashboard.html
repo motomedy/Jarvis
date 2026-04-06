@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Ideas Dashboard</title>
+    <style>
+        :root {
+            --bg-main: #181c24;
+            --bg-card: #232837;
+            --bg-accent: #232837;
+            --primary: #ff6f3c;
+            --primary-hover: #ff914d;
+            --secondary: #3c91e6;
+            --tertiary: #ffca3a;
+            --quaternary: #6bcf63;
+            --text-main: #f7f8fa;
+            --text-muted: #b0b8c9;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px #3c91e633, 0 2px 16px #0003;
+            --transition: 0.18s cubic-bezier(.4,0,.2,1);
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #232837 0%, #181c24 100%);
+            color: var(--text-main);
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 900px;
+            margin: 60px auto 36px auto;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 56px 48px 44px 48px;
+            border: 2px solid var(--secondary);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary);
+            font-size: 2.7rem;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            text-shadow: 0 2px 8px #ff6f3c22;
+        }
+        h2 {
+            color: var(--secondary);
+            font-size: 1.6rem;
+            margin-bottom: 22px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px #3c91e622;
+        }
+        form {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 16px 18px;
+            border: 2px solid var(--tertiary);
+            border-radius: 10px;
+            background: var(--bg-accent);
+            color: var(--text-main);
+            font-size: 1.12rem;
+            outline: none;
+            transition: box-shadow var(--transition), border var(--transition);
+            box-shadow: 0 2px 8px #ffca3a22;
+        }
+        input[type="text"]:focus {
+            box-shadow: 0 0 0 2px var(--primary), 0 2px 8px #ffca3a44;
+            border: 2px solid var(--primary);
+        }
+        button {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 28px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1.12rem;
+            transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+            box-shadow: 0 2px 12px #ff6f3c33, 0 2px 8px #3c91e622;
+            text-shadow: 0 0 6px #ffca3a44;
+        }
+        button:hover {
+            background: linear-gradient(90deg, var(--primary-hover), var(--secondary));
+            color: #fff;
+            box-shadow: 0 0 16px #ff6f3c99, 0 2px 8px #3c91e622;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 32px 0;
+        }
+        li {
+            background: linear-gradient(90deg, #fff 60%, #f0f4ff 100%);
+            margin-bottom: 16px;
+            border-radius: 10px;
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 14px #3c91e611, 0 2px 10px #ffca3a11;
+            border-left: 6px solid var(--primary);
+        }
+        .edit-form {
+            display: flex;
+            gap: 12px;
+        }
+        .edit-input {
+            padding: 12px 14px;
+            border-radius: 9px;
+            border: 2px solid var(--quaternary);
+            background: #232837;
+            color: var(--text-main);
+            font-size: 1.12rem;
+        }
+        .edit-input:focus {
+            box-shadow: 0 0 0 2px var(--quaternary), 0 2px 8px #6bcf6344;
+            border: 2px solid var(--quaternary);
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #3c91e633;
+            margin: 56px 0 40px 0;
+        }
+        .dashboard-section {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 48px 32px;
+            margin-top: 44px;
+            box-shadow: 0 2px 24px #3c91e611, 0 2px 16px #ffca3a11;
+            border: 2px solid var(--secondary);
+        }
+        .dashboard-section h2 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 32px;
+            letter-spacing: 0.9px;
+            text-shadow: 0 2px 8px #ff6f3c22;
+        }
+        .dashboard-section strong {
+            color: var(--secondary);
+            text-shadow: 0 0 6px #3c91e644;
+        }
+        .dashboard-section pre {
+            background: #181c24;
+            color: var(--text-main);
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 1.08rem;
+            margin-bottom: 26px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', monospace;
+            box-shadow: 0 2px 12px #ffca3a11;
+        }
+        .tab-content {
+            animation: fadeIn 0.4s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 1000px) {
+            .container {
+                max-width: 99vw;
+                padding: 18px 2vw 18px 2vw;
+            }
+            .dashboard-section {
+                padding: 18px 2vw;
+            }
+        }
+        @media (max-width: 700px) {
+            .container {
+                margin: 18px 0 12px 0;
+                padding: 8vw 2vw 8vw 2vw;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            h1 {
+                font-size: 1.5rem;
+                padding: 0 2vw;
+            }
+            h2 {
+                font-size: 1.1rem;
+            }
+            form, .edit-form {
+                flex-direction: column;
+                gap: 8px;
+            }
+            input[type="text"], .edit-input, button {
+                font-size: 1rem;
+                padding: 12px 10px;
+            }
+            ul, li {
+                padding: 0;
+            }
+            li {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 12px 8px;
+            }
+            .dashboard-section {
+                margin-top: 24px;
+                padding: 12px 2vw;
+            }
+            .dashboard-section pre {
+                font-size: 0.95rem;
+                padding: 10px;
+            }
+            .dashboard-section h2 {
+                font-size: 1.1rem;
+            }
+            .tab-content {
+                padding: 0;
+            }
+            .dashboard-section button {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+            .dashboard-section div[style*="display:flex"] {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+        }
+        }
+        }
+    </style>
+</head>
+<body>
+        <!-- CEO Agent Section -->
+        <div class="dashboard-section" style="margin-bottom:32px; background:linear-gradient(90deg,#232837 60%,#181c24 100%); box-shadow:0 2px 12px #3c91e633;">
+            <h2 style="margin-bottom:12px;">CEO Agent: Project Oversight</h2>
+            <form action="/ceo/status_check" method="get" style="margin-bottom:18px;">
+                <button type="submit">Request Status Reports from All Agents</button>
+            </form>
+            <div style="margin-bottom:12px;">
+                <strong>Agents Status Reports:</strong>
+                <ul style="margin:0; padding-left:18px;">
+                {% for agent, report in ceo_status_reports.items() %}
+                    <li><strong>{{ agent }}:</strong> {{ report }}</li>
+                {% else %}
+                    <li>No status reports yet.</li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <strong>CEO Timeline:</strong>
+                <ul style="margin:0; padding-left:18px;">
+                {% for event in ceo_timeline %}
+                    <li>{{ event.date }} — {{ event.event }} [{{ event.status }}]</li>
+                {% else %}
+                    <li>No events yet.</li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div style="margin-top:32px;">
+                <h3 style="color:var(--primary); margin-bottom:12px;">Project Metrics Overview</h3>
+                <canvas id="projectMetricsChart" height="120"></canvas>
+            </div>
+        </div>
+        <!-- Chart.js CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        // Prepare data for the chart
+        const projectNames = {{ projects|map(attribute='name')|list|tojson }};
+        const ideasData = {{ projects|map(attribute='metrics')|map(attribute='ideas')|list|tojson }};
+        const videosData = {{ projects|map(attribute='metrics')|map(attribute='videos')|list|tojson }};
+        const engagementData = {{ projects|map(attribute='metrics')|map(attribute='engagement')|list|tojson }};
+
+        const ctx = document.getElementById('projectMetricsChart').getContext('2d');
+        const projectMetricsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: projectNames,
+                datasets: [
+                    {
+                        label: 'Ideas',
+                        data: ideasData,
+                        backgroundColor: 'rgba(255, 202, 58, 0.8)',
+                        borderColor: 'rgba(255, 202, 58, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Videos',
+                        data: videosData,
+                        backgroundColor: 'rgba(60, 145, 230, 0.8)',
+                        borderColor: 'rgba(60, 145, 230, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Engagement',
+                        data: engagementData.map(e => isNaN(e) ? 0 : e),
+                        backgroundColor: 'rgba(255, 111, 60, 0.8)',
+                        borderColor: 'rgba(255, 111, 60, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#f7f8fa', font: { weight: 'bold' } }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Project Metrics Comparison',
+                        color: '#ff6f3c',
+                        font: { size: 18, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#b0b8c9', font: { weight: 'bold' } },
+                        grid: { color: '#232837' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#b0b8c9', font: { weight: 'bold' } },
+                        grid: { color: '#232837' }
+                    }
+                }
+            }
+        });
+        </script>
+    <div class="container">
+        <!-- Project Switcher -->
+        <div class="dashboard-section" style="margin-bottom:32px; background:linear-gradient(90deg,#232837 60%,#181c24 100%); box-shadow:0 4px 24px #3c91e633;">
+            <h1 style="margin-bottom:18px; color:var(--primary); font-size:2.1rem; text-align:left;">Project Overview</h1>
+            <div style="display:flex; flex-wrap:wrap; gap:24px;">
+                {% for proj in projects %}
+                <div style="flex:1 1 260px; min-width:220px; background:var(--bg-main); border-radius:14px; box-shadow:0 2px 12px #3c91e622; padding:22px 18px; border:1.5px solid {% if proj.id == current_project.id %}var(--primary){% else %}var(--secondary){% endif %}; opacity:{% if proj.id == current_project.id %}1{% else %}0.7{% endif %};">
+                    <div style="font-size:1.18rem; font-weight:700; color:var(--primary); margin-bottom:8px;">{{ proj.name }}</div>
+                    <div style="color:var(--text-muted); font-size:0.98rem; margin-bottom:10px;">Niche: {{ proj.niche }}</div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Status:</strong> <span style="color:var(--quaternary);">{{ proj.status }}</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Ideas:</strong> <span style="color:var(--tertiary);">{{ proj.metrics.ideas }}</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Videos Created:</strong> <span style="color:var(--secondary);">{{ proj.metrics.videos }}</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Engagement:</strong> <span style="color:var(--primary-hover);">{{ proj.metrics.engagement }}</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Growth:</strong> <span style="color:var(--quaternary);">{{ proj.metrics.growth }}</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Last Updated:</strong> <span style="color:var(--text-muted);">{{ proj.metrics.last_updated }}</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <strong>Resources:</strong>
+                        <ul style="margin:0; padding-left:18px;">
+                        {% for folder in proj.resources.folders %}
+                            <li><a href="/{{ folder }}" style="color:var(--secondary); text-decoration:underline;">{{ folder }}</a></li>
+                        {% endfor %}
+                        {% for file in proj.resources.files %}
+                            <li><a href="/{{ file }}" style="color:var(--primary-hover); text-decoration:underline;">{{ file }}</a></li>
+                        {% endfor %}
+                        {% for url in proj.resources.urls %}
+                            <li><a href="{{ url }}" target="_blank" style="color:var(--quaternary); text-decoration:underline;">External Link</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <div style="margin-top:10px;">
+                        {% if proj.id != current_project.id %}
+                        <a href="/?project={{ proj.id }}" style="color:var(--primary); font-weight:600; text-decoration:underline;">Switch to this project</a>
+                        {% else %}
+                        <span style="color:var(--primary); font-weight:600;">Current Project</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <!-- Placeholder for future projects -->
+                <div style="flex:1 1 260px; min-width:220px; background:var(--bg-main); border-radius:14px; box-shadow:0 2px 12px #3c91e622; padding:22px 18px; border:1.5px dashed #444; opacity:0.7; display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
+                    <span>+ Add New Project</span>
+                </div>
+            </div>
+        </div>
+        <!-- End Project Switcher -->
+        <h1>{{ current_project.name }} Dashboard</h1>
+        <div style="text-align:center; margin-bottom:24px; font-size:1.18rem; color:var(--secondary); font-weight:600;">
+            Niche: <span style="color:var(--primary); font-weight:700;">{{ current_project.niche }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+            <form action="/add" method="post" style="flex:1; display:flex; gap:8px; min-width:220px;">
+                <input type="text" name="idea" placeholder="Add a new video idea..." required>
+                <button type="submit">Add</button>
+            </form>
+            <a href="/export/csv" style="margin-left:12px; text-decoration:none;">
+                <button type="button">Export CSV</button>
+            </a>
+            <a href="/tiktok/connect" style="margin-left:12px; text-decoration:none;">
+                <button type="button" style="background:linear-gradient(90deg,#010101,#69C9D0);color:#fff;">Connect TikTok</button>
+            </a>
+            <a href="/logout" style="margin-left:12px; text-decoration:none;">
+                <button type="button">Logout</button>
+            </a>
+        </div>
+        <ul>
+            {% for idea in video_ideas %}
+            <li>
+                <form class="edit-form" action="/edit/{{ loop.index0 }}" method="post">
+                    <input class="edit-input" type="text" name="idea" value="{{ idea }}" required>
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="/delete/{{ loop.index0 }}" method="post" style="margin:0;">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        <hr>
+        <div class="dashboard-section">
+            <div style="display:flex; gap:16px; justify-content:center; margin-bottom:24px;">
+                <button id="tab-business" onclick="showTab('business')">Business Outputs</button>
+                <button id="tab-videos" onclick="showTab('videos')">Created Videos</button>
+                <button id="tab-content" onclick="showTab('content')">Content Plan</button>
+            </div>
+            <div id="tab-business-content" class="tab-content">
+                <h2>Jarvis Automated Business Outputs</h2>
+                <div style="margin-bottom:18px;">
+                    <strong>Business Plan:</strong>
+                    <pre>{% if business_plan %}{{ business_plan }}{% else %}No business plan generated yet.{% endif %}</pre>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <strong>Side Hustle Ideas:</strong>
+                    <pre>{% if side_hustles %}{{ side_hustles }}{% else %}No side hustle ideas yet.{% endif %}</pre>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <strong>Viral Content Ideas:</strong>
+                    <pre>{% if viral_content %}{{ viral_content }}{% else %}No viral content yet.{% endif %}</pre>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <strong>AI SaaS Ideas:</strong>
+                    <pre>{% if ai_saas %}{{ ai_saas }}{% else %}No SaaS ideas yet.{% endif %}</pre>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <strong>Email Copy:</strong>
+                    <pre>{% if email_copy %}{{ email_copy }}{% else %}No email copy yet.{% endif %}</pre>
+                </div>
+            </div>
+            <div id="tab-videos-content" class="tab-content" style="display:none;">
+                <h2>Created Videos</h2>
+                {% if video_log %}
+                    <ul>
+                    {% for video in video_log %}
+                        <li><strong>Day {{ video.day }}:</strong> {{ video.title }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No videos created yet.</p>
+                {% endif %}
+            </div>
+            <div id="tab-content-content" class="tab-content" style="display:none;">
+                <h2>Organized Content Plan</h2>
+                <pre>{% if content_plan %}{{ content_plan }}{% else %}No content plan found.{% endif %}</pre>
+            </div>
+        </div>
+        <script>
+        function showTab(tab) {
+            document.getElementById('tab-business-content').style.display = (tab === 'business') ? '' : 'none';
+            document.getElementById('tab-videos-content').style.display = (tab === 'videos') ? '' : 'none';
+            document.getElementById('tab-content-content').style.display = (tab === 'content') ? '' : 'none';
+        }
+        // Default to business tab
+        showTab('business');
+        </script>
+    </div>
+</body>
+</html>

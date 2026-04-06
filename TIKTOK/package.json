@@ -1,0 +1,12 @@
+{
+  "name": "tiktok-dashboard-frontend",
+  "version": "1.0.0",
+  "description": "Frontend assets for the TikTok automation dashboard (Flask backend)",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo 'Frontend served by Flask. No separate dev server.'"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

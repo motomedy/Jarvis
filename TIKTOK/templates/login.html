@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Video Ideas Dashboard</title>
+    <style>
+        body {
+            background: #181a1b;
+            color: #f1f1f1;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 350px;
+            margin: 80px auto;
+            background: #23272e;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #000a;
+            padding: 32px 24px 24px 24px;
+        }
+        h2 {
+            text-align: center;
+            color: #7dd3fc;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #2d323b;
+            color: #f1f1f1;
+        }
+        button {
+            background: #7dd3fc;
+            color: #181a1b;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #38bdf8;
+        }
+        .error {
+            color: #f87171;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        {% with messages = get_flashed_messages(category_filter=["error"]) %}
+        {% if messages %}
+            <div class="error">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+        <form method="post">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>

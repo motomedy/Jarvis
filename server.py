@@ -37,34 +37,12 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi import File, UploadFile
+
 # ---------------------------------------------------------------------------
 # Speech-to-Text (Fish Audio API)
 # ---------------------------------------------------------------------------
 
-@app.post("/api/speech-to-text")
-async def api_speech_to_text(file: UploadFile = File(...)):
-    """Accepts an audio file and returns the transcript using Fish Audio API."""
-    if not FISH_API_KEY:
-        return JSONResponse(status_code=500, content={"error": "Fish Audio API key not set"})
-    try:
-        audio_bytes = await file.read()
-        headers = {
-            "Authorization": f"Bearer {FISH_API_KEY}",
-        }
-        files = {
-            "file": (file.filename, audio_bytes, file.content_type or "audio/wav"),
-        }
-        # Use default model/language
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post("https://api.fish.audio/v1/stt", headers=headers, files=files)
-            if resp.status_code == 200:
-                data = resp.json()
-                return {"transcript": data.get("text", "")}
-            else:
-                return JSONResponse(status_code=502, content={"error": f"Fish Audio error: {resp.text}"})
-    except Exception as e:
-        log.error(f"Speech-to-text failed: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
+# ...existing code...
 from pydantic import BaseModel
 
 from actions import execute_action, monitor_build, open_terminal, open_browser, open_claude_in_project, _generate_project_name, prompt_existing_terminal
@@ -1064,7 +1042,19 @@ async def lifespan(application: FastAPI):
     yield
 
 
+
 app = FastAPI(title="JARVIS Server", version="0.1.0", lifespan=lifespan)
+
+# Static file serving (frontend) — must be after app is defined
+from starlette.staticfiles import StaticFiles
+from starlette.responses import FileResponse
+FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(str(FRONTEND_DIST / "index.html"))
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -1073,6 +1063,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------------------------------------------------------
+# Speech-to-Text (Fish Audio API)
+# ---------------------------------------------------------------------------
+
+from fastapi import File, UploadFile
+@app.post("/api/speech-to-text")
+async def api_speech_to_text(file: UploadFile = File(...)):
+    """Accepts an audio file and returns the transcript using Fish Audio API."""
+    if not FISH_API_KEY:
+        return JSONResponse(status_code=500, content={"error": "Fish Audio API key not set"})
+    try:
+        audio_bytes = await file.read()
+        headers = {
+            "Authorization": f"Bearer {FISH_API_KEY}",
+        }
+        files = {
+            "file": (file.filename, audio_bytes, file.content_type or "audio/wav"),
+        }
+        # Use default model/language
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post("https://api.fish.audio/v1/stt", headers=headers, files=files)
+            if resp.status_code == 200:
+                data = resp.json()
+                return {"transcript": data.get("text", "")}
+            else:
+                return JSONResponse(status_code=502, content={"error": f"Fish Audio error: {resp.text}"})
+    except Exception as e:
+        log.error(f"Speech-to-text failed: {e}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 # -- REST Endpoints --------------------------------------------------------
@@ -2088,8 +2108,6 @@ async def api_fix_self():
 # Static file serving (frontend)
 # ---------------------------------------------------------------------------
 
-from starlette.staticfiles import StaticFiles
-from starlette.responses import FileResponse
 
 FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
 

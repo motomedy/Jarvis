@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do Dashboard</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 24px; }
+    h1 { text-align: center; }
+    .task-list { margin: 24px 0; }
+    .task { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .task:last-child { border-bottom: none; }
+    .priority { font-weight: bold; padding: 2px 8px; border-radius: 4px; }
+    .priority.high { color: #fff; background: #e74c3c; }
+    .priority.medium { color: #fff; background: #f39c12; }
+    .priority.low { color: #fff; background: #27ae60; }
+    .actions button { margin-left: 8px; }
+    form { display: flex; gap: 8px; margin-bottom: 16px; }
+    input, select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
+    button { padding: 6px 12px; border-radius: 4px; border: none; background: #3498db; color: #fff; cursor: pointer; }
+    button:disabled { background: #ccc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do Dashboard</h1>
+    <form id="addForm">
+      <input type="text" id="title" placeholder="Task title" required>
+      <input type="text" id="description" placeholder="Description">
+      <label for="priority">Priority:</label>
+      <select id="priority">
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <button type="submit">Add</button>
+    </form>
+    <div class="task-list" id="taskList"></div>
+  </div>
+  <script>
+    const api = (path, opts={}) => fetch(path, opts).then(r => r.json());
+    function renderTask(t) {
+      return `<div class="task">
+        <div>
+          <span class="priority ${t.priority}">${t.priority}</span>
+          <span style="margin-left:8px;${t.completed?'text-decoration:line-through;':''}">${t.title}</span>
+          <small style="color:#888;">${t.description||''}</small>
+        </div>
+        <div class="actions">
+          <button onclick="editTask(${t.id})">Edit</button>
+          <button onclick="deleteTask(${t.id})">Delete</button>
+          <button onclick="completeTask(${t.id})" ${t.completed?'disabled':''}>Complete</button>
+        </div>
+      </div>`;
+    }
+    function loadTasks() {
+      api('/tasks').then(ts => {
+        document.getElementById('taskList').innerHTML = ts.map(renderTask).join('');
+      });
+    }
+    document.getElementById('addForm').onsubmit = e => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const priority = document.getElementById('priority').value;
+      api('/tasks', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({id:0,title,description,priority,completed:false})
+      }).then(() => {
+        loadTasks();
+        e.target.reset();
+      });
+    };
+    window.deleteTask = id => {
+      api(`/tasks/${id}`, {method:'DELETE'}).then(loadTasks);
+    };
+    window.completeTask = id => {
+      api(`/tasks/${id}/complete`, {method:'POST'}).then(loadTasks);
+    };
+    window.editTask = id => {
+      const title = prompt('Edit title:');
+      if (!title) return;
+      const description = prompt('Edit description:');
+      const priority = prompt('Edit priority (high, medium, low):');
+      api(`/tasks/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({id,title,description,priority,completed:false})
+      }).then(loadTasks);
+    };
+    loadTasks();
+  </script>
+</body>
+</html>
