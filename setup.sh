@@ -5,19 +5,29 @@ set -e
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "🔧 Setting up JARVIS..."
 
-# Python virtual environment + dependencies
+# ── .env ────────────────────────────────────────────────────────────────────
+if [ ! -f "$REPO_DIR/.env" ]; then
+    cp "$REPO_DIR/.env.example" "$REPO_DIR/.env"
+    echo "✅ Created .env from .env.example (edit it to add your Fish Audio key)"
+else
+    echo "✅ .env already exists"
+fi
+
+# ── Python virtualenv + dependencies ────────────────────────────────────────
 cd "$REPO_DIR"
-python3 -m venv .venv
+if [ ! -d ".venv" ]; then
+    python3 -m venv .venv
+fi
 source .venv/bin/activate
 pip install --quiet -r requirements.txt
 echo "✅ Python dependencies installed"
 
-# Frontend dependencies
+# ── Frontend dependencies ────────────────────────────────────────────────────
 cd "$REPO_DIR/frontend"
 npm install --silent
 echo "✅ Frontend dependencies installed"
 
-# Ollama
+# ── Ollama ───────────────────────────────────────────────────────────────────
 if ! command -v ollama &>/dev/null; then
     echo "📦 Installing Ollama..."
     sudo apt-get install -y zstd -q
@@ -25,11 +35,10 @@ if ! command -v ollama &>/dev/null; then
     echo "✅ Ollama installed"
 fi
 
-# Pull model (reads OLLAMA_MODEL from .env, defaults to qwen2:0.5b)
-OLLAMA_MODEL=$(grep "^OLLAMA_MODEL=" "$REPO_DIR/.env" 2>/dev/null | cut -d= -f2 | tr -d '"' || echo "qwen2:0.5b")
+# Pull model defined in .env (defaults to qwen2:0.5b)
+OLLAMA_MODEL=$(grep "^OLLAMA_MODEL=" "$REPO_DIR/.env" 2>/dev/null | cut -d= -f2 | tr -d '"' || echo "")
 OLLAMA_MODEL="${OLLAMA_MODEL:-qwen2:0.5b}"
 
-# Start ollama temporarily to pull the model
 ollama serve &>/tmp/ollama-setup.log &
 OLLAMA_PID=$!
 sleep 3
@@ -44,4 +53,7 @@ fi
 
 kill $OLLAMA_PID 2>/dev/null || true
 
-echo "✅ JARVIS setup complete — run 'bash start.sh' to launch"
+echo ""
+echo "✅ JARVIS setup complete!"
+echo "   → Optional: edit .env to add your Fish Audio key for voice TTS"
+echo "   → Run 'bash start.sh' to launch (or just reopen the container)"
