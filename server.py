@@ -32,7 +32,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from llm import GeminiClient
+from llm import OllamaClient
 import httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -60,7 +60,8 @@ log = logging.getLogger("jarvis")
 # Config
 # ---------------------------------------------------------------------------
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+OLLAMA_HOST  = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5")
 FISH_API_KEY = os.getenv("FISH_API_KEY", "")
 FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "612b878b113047d9a770c069c8b4fdfe")  # JARVIS (MCU)
 FISH_API_URL = "https://api.fish.audio/v1/tts"
@@ -588,7 +589,7 @@ def apply_speech_corrections(text: str) -> str:
 # LLM Intent Classifier (replaces keyword-based action detection)
 # ---------------------------------------------------------------------------
 
-async def classify_intent(text: str, client: GeminiClient) -> dict:
+async def classify_intent(text: str, client: OllamaClient) -> dict:
     """Classify every user message using Haiku LLM.
 
     Returns: {"action": "open_terminal|browse|build|chat", "target": "description"}
@@ -897,9 +898,9 @@ async def _execute_prompt_project(project_name: str, prompt: str, work_session: 
             msg = f"Sir, I ran into an issue with {project_name}. {full_response[:150] if full_response else 'No response received.'}"
         else:
             # Summarize via Haiku — don't read word for word
-            if gemini_client:
+            if ollama_client:
                 try:
-                    summary = await gemini_client.messages.create(
+                    summary = await ollama_client.messages.create(
                         model="claude-haiku-4-5-20251001",
                         max_tokens=150,
                         system=(
@@ -965,9 +966,9 @@ async def self_work_and_notify(session: WorkSession, prompt: str, ws):
         log.info(f"Background work complete ({len(full_response)} chars)")
 
         # Summarize and speak
-        if gemini_client and full_response:
+        if ollama_client and full_response:
             try:
-                summary = await gemini_client.messages.create(
+                summary = await ollama_client.messages.create(
                     model="claude-haiku-4-5-20251001",
                     max_tokens=100,
                     system="You are JARVIS. Summarize what you just completed in 1 sentence. First person — 'I built', 'I set up'. No markdown. Never say 'Claude Code'.",
@@ -1036,7 +1037,7 @@ async def synthesize_speech(text: str) -> Optional[bytes]:
 
 async def generate_response(
     text: str,
-    client: GeminiClient,
+    client: OllamaClient,
     task_mgr: ClaudeTaskManager,
     projects: list[dict],
     conversation_history: list[dict],
@@ -1113,7 +1114,7 @@ async def generate_response(
 
 # Shared state
 task_manager = ClaudeTaskManager(max_concurrent=3)
-gemini_client: Optional[GeminiClient] = None
+ollama_client: Optional[OllamaClient] = None
 cached_projects: list[dict] = []
 recently_built: list[dict] = []  # [{"name": str, "path": str, "time": float}]
 dispatch_registry = DispatchRegistry()
@@ -1288,11 +1289,9 @@ return windowList
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    global gemini_client, cached_projects
-    if GEMINI_API_KEY:
-        gemini_client = GeminiClient(api_key=GEMINI_API_KEY)
-    else:
-        log.warning("GEMINI_API_KEY not set — LLM features disabled")
+    global ollama_client, cached_projects
+    ollama_client = OllamaClient(host=OLLAMA_HOST, model=OLLAMA_MODEL)
+    log.info(f"Ollama client ready — host={OLLAMA_HOST} model={OLLAMA_MODEL}")
     cached_projects = []
 
     # Start context refresh in a separate thread (never touches event loop)
@@ -1636,8 +1635,8 @@ async def _do_mail_lookup() -> str:
 
 async def _do_screen_lookup() -> str:
     """Screen describe — runs in thread."""
-    if gemini_client:
-        return await describe_screen(gemini_client)
+    if ollama_client:
+        return await describe_screen(ollama_client)
     windows = await get_active_windows()
     if windows:
         apps = set(w["app"] for w in windows)
@@ -1725,7 +1724,7 @@ async def handle_browse(text: str, target: str) -> str:
     return "Searching for that, sir."
 
 
-async def handle_research(text: str, target: str, client: GeminiClient) -> str:
+async def handle_research(text: str, target: str, client: OllamaClient) -> str:
     """Deep research with Opus — write results to HTML, open in browser."""
     try:
         research_response = await client.messages.create(
@@ -1784,7 +1783,7 @@ blockquote {{ border-left: 3px solid #0ea5e9; margin-left: 0; padding-left: 16px
 async def _update_session_summary(
     old_summary: str,
     rotated_messages: list[dict],
-    client: GeminiClient,
+    client: OllamaClient,
 ) -> str:
     """Background Haiku call to update the rolling session summary."""
     prompt = f"""Update this conversation summary to include the new messages.
@@ -1998,7 +1997,7 @@ async def voice_handler(ws: WebSocket):
                     if is_casual_question(user_text):
                         # Quick chat — bypass claude -p, use Haiku
                         response_text = await generate_response(
-                            user_text, gemini_client, task_manager,
+                            user_text, ollama_client, task_manager,
                             cached_projects, history,
                             last_response=last_jarvis_response,
                             session_summary=session_summary,
@@ -2011,7 +2010,7 @@ async def voice_handler(ws: WebSocket):
                         full_response = await work_session.send(user_text)
 
                         # Detect if Claude Code is stalling (asking questions instead of building)
-                        if full_response and gemini_client:
+                        if full_response and ollama_client:
                             stall_words = ["which option", "would you prefer", "would you like me to",
                                            "before I proceed", "before proceeding", "should I",
                                            "do you want me to", "let me know", "please confirm",
@@ -2035,9 +2034,9 @@ async def voice_handler(ws: WebSocket):
                             log.info(f"Auto-opening {localhost_match.group(0)}")
 
                         # Always summarize work mode responses via Haiku
-                        if full_response and gemini_client:
+                        if full_response and ollama_client:
                             try:
-                                summary = await gemini_client.messages.create(
+                                summary = await ollama_client.messages.create(
                                     model="claude-haiku-4-5-20251001",
                                     max_tokens=100,
                                     system=(
@@ -2098,11 +2097,11 @@ async def voice_handler(ws: WebSocket):
                         else:
                             response_text = "Understood, sir."
                     else:
-                        if not gemini_client:
+                        if not ollama_client:
                             response_text = "API key not configured."
                         else:
                             response_text = await generate_response(
-                                user_text, gemini_client, task_manager,
+                                user_text, ollama_client, task_manager,
                                 cached_projects, history,
                                 last_response=last_jarvis_response,
                                 session_summary=session_summary,
@@ -2255,11 +2254,11 @@ async def voice_handler(ws: WebSocket):
                     messages_since_last_summary = 0
                     # Get messages that are about to be rotated out
                     rotated = history[:-20] if len(history) > 20 else []
-                    if rotated and gemini_client:
+                    if rotated and ollama_client:
                         async def _do_summary():
                             nonlocal session_summary, summary_update_pending
                             session_summary = await _update_session_summary(
-                                session_summary, rotated, gemini_client
+                                session_summary, rotated, ollama_client
                             )
                             summary_update_pending = False
                         asyncio.create_task(_do_summary())
@@ -2267,8 +2266,8 @@ async def voice_handler(ws: WebSocket):
                         summary_update_pending = False
 
                 # Extract memories in background (doesn't block response)
-                if gemini_client and len(user_text) > 15:
-                    asyncio.create_task(extract_memories(user_text, response_text, gemini_client))
+                if ollama_client and len(user_text) > 15:
+                    asyncio.create_task(extract_memories(user_text, response_text, ollama_client))
 
                 # TTS
                 tts = strip_markdown_for_tts(response_text)
@@ -2372,14 +2371,11 @@ async def api_settings_keys(body: KeyUpdate):
     return {"success": True}
 
 @app.post("/api/settings/test-gemini")
-async def api_test_gemini(body: KeyTest):
-    key = body.key_value or os.getenv("GEMINI_API_KEY", "")
-    if not key:
-        return {"valid": False, "error": "No key provided"}
+async def api_test_ollama():
     try:
-        client = GeminiClient(api_key=key)
-        await client.messages.create(model="gemini-2.5-flash-preview-04-17", max_tokens=10, messages=[{"role": "user", "content": "Hi"}])
-        return {"valid": True}
+        client = OllamaClient(host=OLLAMA_HOST, model=OLLAMA_MODEL)
+        await client.messages.create(model=OLLAMA_MODEL, max_tokens=10, messages=[{"role": "user", "content": "Hi"}])
+        return {"valid": True, "host": OLLAMA_HOST, "model": OLLAMA_MODEL}
     except Exception as e:
         return {"valid": False, "error": str(e)[:200]}
 
@@ -2431,7 +2427,7 @@ async def api_settings_status():
         "server_port": 8340,
         "uptime_seconds": int(time.time() - _session_start),
         "env_keys_set": {
-            "gemini": bool(env_dict.get("GEMINI_API_KEY", "").strip()),
+            "ollama": True,  # always available (local)
             "fish_audio": bool(env_dict.get("FISH_API_KEY", "").strip() and env_dict.get("FISH_API_KEY", "") != "your-fish-audio-api-key-here"),
             "fish_voice_id": bool(env_dict.get("FISH_VOICE_ID", "").strip()),
             "user_name": env_dict.get("USER_NAME", ""),
