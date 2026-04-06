@@ -28,28 +28,29 @@ def clone_repo(repo_url, dest_path=None):
         else:
             logging.error(f"Git clone failed: {result.stderr}")
             return False
-    def print_setup_instructions(repo_path):
-        """Print setup instructions from INSTALL.md or README.md if present."""
-        candidates = [
-            os.path.join(repo_path, "INSTALL.md"),
-            os.path.join(repo_path, "README.md"),
-            os.path.join(repo_path, ".opencode", "INSTALL.md"),
-            os.path.join(repo_path, ".codex", "INSTALL.md"),
-        ]
-        for file in candidates:
-            if os.path.exists(file):
-                print(f"\n--- Setup instructions from {file} ---\n")
-                try:
-                    with open(file, "r") as f:
-                        print(f.read(2000))
-                except Exception as e:
-                    print(f"Could not read {file}: {e}")
-                print("\n--- End of setup instructions ---\n")
-                return
-        print("No INSTALL.md or README.md found for setup instructions.")
     except Exception as e:
         logging.error(f"Exception during git clone: {e}")
         return False
+
+def print_setup_instructions(repo_path):
+    """Print setup instructions from INSTALL.md or README.md if present."""
+    candidates = [
+        os.path.join(repo_path, "INSTALL.md"),
+        os.path.join(repo_path, "README.md"),
+        os.path.join(repo_path, ".opencode", "INSTALL.md"),
+        os.path.join(repo_path, ".codex", "INSTALL.md"),
+    ]
+    for file in candidates:
+        if os.path.exists(file):
+            print(f"\n--- Setup instructions from {file} ---\n")
+            try:
+                with open(file, "r") as f:
+                    print(f.read(2000))
+            except Exception as e:
+                print(f"Could not read {file}: {e}")
+            print("\n--- End of setup instructions ---\n")
+            return
+    print("No INSTALL.md or README.md found for setup instructions.")
 
 def register_repo_path(path):
     """Register the repo path for JARVIS to access later (writes to a known file)."""
@@ -63,7 +64,7 @@ def register_repo_path(path):
 
 if __name__ == "__main__":
     # Test cloning the provided repo link and register for JARVIS
-    test_url = "https://github.com/obra/superpowers.git"
+    test_url = "https://github.com/ruvnet/ruflo.git"
     print(f"Cloning {test_url} ...")
     success = clone_repo(test_url)
     if success:
