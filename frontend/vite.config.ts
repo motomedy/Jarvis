@@ -3,14 +3,15 @@ import { defineConfig } from "vite";
 export default defineConfig({
   server: {
     port: 5173,
+    host: '0.0.0.0',
     proxy: {
       "/ws": {
-        target: "https://localhost:8340",
+        target: "http://localhost:8340",
         ws: true,
         secure: false,
       },
       "/api": {
-        target: "https://localhost:8340",
+        target: "http://localhost:8340",
         secure: false,
       },
     },

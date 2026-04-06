@@ -1,0 +1,14 @@
+{
+  "name": "Jarvis",
+  "forwardPorts": [5173, 8340],
+  "portsAttributes": {
+    "5173": {
+      "label": "Frontend (Vite)",
+      "onAutoForward": "openBrowser"
+    },
+    "8340": {
+      "label": "Backend (FastAPI)",
+      "onAutoForward": "notify"
+    }
+  }
+}
