@@ -11,5 +11,6 @@
       "onAutoForward": "notify"
     }
   },
+  "postCreateCommand": "bash /workspaces/Jarvis/setup.sh",
   "postStartCommand": "bash /workspaces/Jarvis/start.sh"
 }
