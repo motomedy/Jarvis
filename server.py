@@ -855,6 +855,7 @@ anthropic_client = None
 cached_projects: list[dict] = []
 recently_built: list[dict] = []  # [{"name": str, "path": str, "time": float}]
 dispatch_registry = DispatchRegistry()
+_last_greeting_time = 0.0
 
 # Usage tracking — logs every call with timestamp, persists to disk
 _USAGE_FILE = Path(__file__).parent / "data" / "usage_log.jsonl"
