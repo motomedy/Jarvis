@@ -90,6 +90,9 @@ Edit your `.env` file:
 ANTHROPIC_API_KEY=your-anthropic-api-key-here
 FISH_API_KEY=your-fish-audio-api-key-here
 
+# Speech-to-text provider fallback (Chrome Web Speech API is primary in frontend)
+STT_PROVIDER=fish
+
 # Optional -- your name (JARVIS will address you personally)
 USER_NAME=Tony
 

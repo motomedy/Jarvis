@@ -238,6 +238,10 @@
     </style>
 </head>
 <body>
+                <div class="dashboard-section" style="margin-bottom:32px; background:linear-gradient(90deg,#232837 60%,#181c24 100%); box-shadow:0 2px 12px #3c91e633;">
+                    <h2 style="margin-bottom:12px;">Jarvis Production Status Report</h2>
+                    <pre style="background:#181c24; color:#f7f8fa; border-radius:10px; padding:18px; font-size:1.08rem; margin-bottom:0;">{{ jarvis_report }}</pre>
+                </div>
         <!-- CEO Agent Section -->
         <div class="dashboard-section" style="margin-bottom:32px; background:linear-gradient(90deg,#232837 60%,#181c24 100%); box-shadow:0 2px 12px #3c91e633;">
             <h2 style="margin-bottom:12px;">CEO Agent: Project Oversight</h2>
@@ -245,65 +249,75 @@
                 <button type="submit">Request Status Reports from All Agents</button>
             </form>
             <div style="margin-bottom:12px;">
-                <strong>Agents Status Reports:</strong>
+                <div><strong>Agents Status Reports:</strong></div>
+                {% if ceo_status_reports|length > 0 %}
                 <ul style="margin:0; padding-left:18px;">
-                {% for agent, report in ceo_status_reports.items() %}
-                    <li><strong>{{ agent }}:</strong> {{ report }}</li>
-                {% else %}
-                    <li>No status reports yet.</li>
-                {% endfor %}
-                </ul>
-                <div style="margin-top:10px;">
-                    <strong>CEO Recommended Team for this Project:</strong>
-                    <ul style="margin:0; padding-left:18px;">
-                    {% for agent in ceo_team %}
-                        <li>{{ agent }}</li>
+                    {% for agent, report in ceo_status_reports.items() %}
+                        <li><strong>{{ agent }}:</strong> {{ report }}</li>
                     {% endfor %}
+                </ul>
+                {% else %}
+                <ul style="margin:0; padding-left:18px;"><li>No status reports yet.</li></ul>
+                {% endif %}
+                <div style="margin-top:10px;">
+                    <div><strong>CEO Recommended Team for this Project:</strong></div>
+                    {% if ceo_team|length > 0 %}
+                    <ul style="margin:0; padding-left:18px;">
+                        {% for agent in ceo_team %}
+                            <li>{{ agent }}</li>
+                        {% endfor %}
                     </ul>
+                    {% endif %}
                 </div>
                 <div style="margin-top:10px;">
-                    <strong>SEO & Social Marketing Tools:</strong>
-                    <ul style="margin:0; padding-left:18px;">
-                        <li><strong>Search Engine Agent:</strong> Optimizes video metadata, suggests trending keywords.</li>
-                        <li><strong>Social Media Marketer Agent:</strong> Schedules and promotes videos across platforms.</li>
-                    </ul>
+                    <div><strong>SEO & Social Marketing Tools:</strong></div>
+                    <ul style="margin:0; padding-left:18px;"><li><strong>Search Engine Agent:</strong> Optimizes video metadata, suggests trending keywords.</li>
+                        <li><strong>Social Media Marketer Agent:</strong> Schedules and promotes videos across platforms.</li></ul>
                 </div>
             </div>
             <div style="margin-bottom:12px;">
                 <strong>Content Deadlines:</strong>
                 <ul style="margin:0; padding-left:18px;">
-                {% if ceo_deadlines.overdue %}
-                    <li style="color:#ff6f3c; font-weight:bold;">Overdue:
-                        <ul style="margin:0; padding-left:18px;">
-                        {% for item in ceo_deadlines.overdue %}
-                            <li style="color:#ff6f3c;">{{ item.title }} (was due {{ item.due_date }})</li>
-                        {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
-                {% if ceo_deadlines.upcoming %}
-                    <li style="color:#ffca3a; font-weight:bold;">Due Soon:
-                        <ul style="margin:0; padding-left:18px;">
-                        {% for item in ceo_deadlines.upcoming %}
-                            <li style="color:#ffca3a;">{{ item.title }} (due {{ item.due_date }})</li>
-                        {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
-                {% if not ceo_deadlines.overdue and not ceo_deadlines.upcoming %}
-                    <li style="color:#6bcf63;">All content is on schedule.</li>
-                {% endif %}
+                    {% if ceo_deadlines.overdue %}
+                        <li style="color:#ff6f3c; font-weight:bold;">
+                            <span>Overdue:</span>
+                            {% if ceo_deadlines.overdue|length > 0 %}
+                            <ul style="margin:0; padding-left:18px;">
+                                {% for item in ceo_deadlines.overdue %}
+                                    <li style="color:#ff6f3c;">{{ item.title }} (was due {{ item.due_date }})</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                    {% if ceo_deadlines.upcoming %}
+                        <li style="color:#ffca3a; font-weight:bold;">
+                            <span>Due Soon:</span>
+                            {% if ceo_deadlines.upcoming|length > 0 %}
+                            <ul style="margin:0; padding-left:18px;">
+                                {% for item in ceo_deadlines.upcoming %}
+                                    <li style="color:#ffca3a;">{{ item.title }} (due {{ item.due_date }})</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                    {% if not ceo_deadlines.overdue and not ceo_deadlines.upcoming %}
+                        <li style="color:#6bcf63;">All content is on schedule.</li>
+                    {% endif %}
                 </ul>
             </div>
             <div>
-                <strong>CEO Timeline:</strong>
+                <div><strong>CEO Timeline:</strong></div>
+                {% if ceo_timeline|length > 0 %}
                 <ul style="margin:0; padding-left:18px;">
-                {% for event in ceo_timeline %}
-                    <li>{{ event.date }} — {{ event.event }} [{{ event.status }}]</li>
-                {% else %}
-                    <li>No events yet.</li>
-                {% endfor %}
+                    {% for event in ceo_timeline %}
+                        <li>{{ event.date }} — {{ event.event }} [{{ event.status }}]</li>
+                    {% endfor %}
                 </ul>
+                {% else %}
+                <ul style="margin:0; padding-left:18px;"><li>No events yet.</li></ul>
+                {% endif %}
             </div>
             <div style="margin-top:32px;">
                 <h3 style="color:var(--primary); margin-bottom:12px;">Project Metrics Overview</h3>
@@ -404,18 +418,21 @@
                         <strong>Last Updated:</strong> <span style="color:var(--text-muted);">{{ proj.metrics.last_updated }}</span>
                     </div>
                     <div style="margin-bottom:10px;">
-                        <strong>Resources:</strong>
+                        <div><strong>Resources:</strong></div>
+                        {% set has_resources = proj.resources.folders|length > 0 or proj.resources.files|length > 0 or proj.resources.urls|length > 0 %}
+                        {% if has_resources %}
                         <ul style="margin:0; padding-left:18px;">
-                        {% for folder in proj.resources.folders %}
-                            <li><a href="/{{ folder }}" style="color:var(--secondary); text-decoration:underline;">{{ folder }}</a></li>
-                        {% endfor %}
-                        {% for file in proj.resources.files %}
-                            <li><a href="/{{ file }}" style="color:var(--primary-hover); text-decoration:underline;">{{ file }}</a></li>
-                        {% endfor %}
-                        {% for url in proj.resources.urls %}
-                            <li><a href="{{ url }}" target="_blank" style="color:var(--quaternary); text-decoration:underline;">External Link</a></li>
-                        {% endfor %}
+                            {% for folder in proj.resources.folders %}
+                                <li><a href="/{{ folder }}" style="color:var(--secondary); text-decoration:underline;">{{ folder }}</a></li>
+                            {% endfor %}
+                            {% for file in proj.resources.files %}
+                                <li><a href="/{{ file }}" style="color:var(--primary-hover); text-decoration:underline;">{{ file }}</a></li>
+                            {% endfor %}
+                            {% for url in proj.resources.urls %}
+                                <li><a href="{{ url }}" target="_blank" style="color:var(--quaternary); text-decoration:underline;">External Link</a></li>
+                            {% endfor %}
                         </ul>
+                        {% endif %}
                     </div>
                     <div style="margin-top:10px;">
                         {% if proj.id != current_project.id %}
@@ -439,7 +456,7 @@
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
             <form action="/add" method="post" style="flex:1; display:flex; gap:8px; min-width:220px;">
-                <input type="text" name="idea" placeholder="Add a new video idea..." required>
+                <input type="text" name="idea" placeholder="Add a new video idea..." title="Add a new video idea" required>
                 <button type="submit">Add</button>
             </form>
             <a href="/export/csv" style="margin-left:12px; text-decoration:none;">
@@ -452,11 +469,12 @@
                 <button type="button">Logout</button>
             </a>
         </div>
+        {% if video_ideas|length > 0 %}
         <ul>
             {% for idea in video_ideas %}
             <li>
                 <form class="edit-form" action="/edit/{{ loop.index0 }}" method="post">
-                    <input class="edit-input" type="text" name="idea" value="{{ idea }}" required>
+                    <input class="edit-input" type="text" name="idea" value="{{ idea }}" required title="Edit video idea" placeholder="Edit video idea">
                     <button type="submit">Edit</button>
                 </form>
                 <form action="/delete/{{ loop.index0 }}" method="post" style="margin:0;">
@@ -465,6 +483,7 @@
             </li>
             {% endfor %}
         </ul>
+        {% endif %}
         <hr>
         <div class="dashboard-section">
             <div style="display:flex; gap:16px; justify-content:center; margin-bottom:24px;">
@@ -518,7 +537,7 @@
             document.getElementById('tab-videos-content').style.display = (tab === 'videos') ? '' : 'none';
             document.getElementById('tab-content-content').style.display = (tab === 'content') ? '' : 'none';
         }
-        // Default to business tab
+        // Prepare data for the chart
         showTab('business');
         </script>
     </div>

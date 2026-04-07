@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchEvents, fetchTasks, Event, Task } from './api';
 import { MonthView, DayView } from './FullCalendarView';
+import { DailyTaskList, WeeklyTaskList } from './TaskViews';
 import EventForm from './EventForm';
 import { createEvent } from './api';
 
@@ -22,6 +23,12 @@ const Dashboard: React.FC = () => {
     }
     load();
   }, [refresh]);
+
+  const [taskView, setTaskView] = useState<'daily' | 'weekly'>('daily');
+  const today = new Date();
+  // Find the start of the week (Sunday)
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
 
   return (
     <div style={{ display: 'flex', gap: 48 }}>
@@ -73,17 +80,14 @@ const Dashboard: React.FC = () => {
       </section>
       <section style={{ flex: 1, minWidth: 300 }}>
         <h2>Tasks</h2>
+        <div style={{ marginBottom: 8 }}>
+          <button onClick={() => setTaskView('daily')} disabled={taskView === 'daily'}>Daily</button>
+          <button onClick={() => setTaskView('weekly')} disabled={taskView === 'weekly'} style={{ marginLeft: 8 }}>Weekly</button>
+        </div>
         {loading ? <p>Loading...</p> : (
-          <ul>
-            {tasks.map(task => (
-              <li key={task.id}>
-                <b>{task.title}</b> <br />
-                Due: {task.due || 'N/A'} <br />
-                Status: {task.status} <br />
-                {task.description}
-              </li>
-            ))}
-          </ul>
+          taskView === 'daily'
+            ? <DailyTaskList date={today} tasks={tasks} />
+            : <WeeklyTaskList weekStart={weekStart} tasks={tasks} />
         )}
       </section>
     </div>

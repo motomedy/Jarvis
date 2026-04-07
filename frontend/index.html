@@ -33,11 +33,18 @@
     <!-- Dropdown menu -->
     <div id="menu-dropdown" style="display:none">
       <button id="btn-settings">Settings</button>
+      <button id="btn-test-voice">Test Voice</button>
       <button id="btn-restart">Restart Server</button>
       <button id="btn-fix-self">Fix Yourself</button>
     </div>
 
+    <div id="chat-panel">
+      <div id="chat-header">conversation</div>
+      <div id="chat-log"></div>
+    </div>
+
     <div id="status-text"></div>
+    <div id="stt-source">stt: detecting...</div>
     <div id="jarvis-label">JARVIS</div>
     <div id="error-text"></div>
     <script type="module" src="/src/main.ts"></script>

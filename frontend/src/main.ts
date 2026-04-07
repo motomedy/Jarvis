@@ -6,7 +6,7 @@
  */
 
 import { createOrb, type OrbState } from "./orb";
-import { createVoiceInput, createAudioPlayer } from "./voice";
+import { createVoiceInput, createAudioPlayer, type SttSource } from "./voice";
 import { createSocket } from "./ws";
 import { openSettings, checkFirstTimeSetup } from "./settings";
 import "./style.css";
@@ -21,6 +21,109 @@ let isMuted = false;
 
 const statusEl = document.getElementById("status-text")!;
 const errorEl = document.getElementById("error-text")!;
+const sttSourceEl = document.getElementById("stt-source")!;
+const chatLogEl = document.getElementById("chat-log")!;
+
+let lastAssistantMsg = "";
+let lastAssistantMsgAt = 0;
+
+function addChatMessage(role: "user" | "assistant", text: string) {
+  const content = text.trim();
+  if (!content) return;
+
+  if (role === "assistant") {
+    const now = Date.now();
+    // Avoid duplicate assistant lines when both audio and text events carry the same text.
+    if (content === lastAssistantMsg && now - lastAssistantMsgAt < 1500) return;
+    lastAssistantMsg = content;
+    lastAssistantMsgAt = now;
+  }
+
+  const row = document.createElement("div");
+  row.className = `chat-msg ${role === "user" ? "chat-msg-user" : "chat-msg-assistant"}`;
+  row.textContent = content;
+  chatLogEl.appendChild(row);
+  while (chatLogEl.childElementCount > 60) {
+    chatLogEl.removeChild(chatLogEl.firstElementChild!);
+  }
+  chatLogEl.scrollTop = chatLogEl.scrollHeight;
+}
+
+let speechUnlocked = false;
+let pendingSpeechText: string | null = null;
+let speechWarningShown = false;
+
+function pickSpeechVoice(): SpeechSynthesisVoice | null {
+  if (!("speechSynthesis" in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  return (
+    voices.find((v) => /^en(-|_)/i.test(v.lang) && /google|samantha|alex|english/i.test(v.name)) ||
+    voices.find((v) => /^en(-|_)/i.test(v.lang)) ||
+    voices[0] ||
+    null
+  );
+}
+
+function flushPendingSpeech() {
+  if (!pendingSpeechText) return;
+  const text = pendingSpeechText;
+  pendingSpeechText = null;
+  speakTextFallback(text);
+}
+
+function speakTextFallback(text: string) {
+  if (isMuted || !text || !("speechSynthesis" in window)) return;
+  if (!speechUnlocked) {
+    pendingSpeechText = text;
+    if (!speechWarningShown) {
+      showError("Tap anywhere once to enable voice output.");
+      speechWarningShown = true;
+    }
+    return;
+  }
+
+  try {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    const voice = pickSpeechVoice();
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    }
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    // Ignore speech synthesis failures and keep text fallback.
+  }
+}
+
+function unlockSpeechOutput() {
+  if (!("speechSynthesis" in window)) return;
+  speechUnlocked = true;
+  speechWarningShown = false;
+  // Prime voice list in browsers that load voices lazily.
+  window.speechSynthesis.getVoices();
+  flushPendingSpeech();
+}
+
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    flushPendingSpeech();
+  };
+}
+
+function updateSttSource(source: SttSource) {
+  if (source === "chrome") {
+    sttSourceEl.textContent = "stt: chrome";
+    sttSourceEl.classList.remove("stt-backend");
+  } else {
+    sttSourceEl.textContent = "stt: backend";
+    sttSourceEl.classList.add("stt-backend");
+  }
+}
 
 function showError(msg: string) {
   errorEl.textContent = msg;
@@ -84,12 +187,16 @@ const voiceInput = createVoiceInput(
   (text: string) => {
     // Cancel any current JARVIS response before sending new input
     audioPlayer.stop();
+    addChatMessage("user", text);
     // User spoke — send transcript
     socket.send({ type: "transcript", text, isFinal: true });
     transition("thinking");
   },
   (msg: string) => {
     showError(msg);
+  },
+  (source: SttSource) => {
+    updateSttSource(source);
   }
 );
 
@@ -122,7 +229,10 @@ socket.onMessage((msg) => {
       transition("idle");
     }
     // Log text for debugging
-    if (msg.text) console.log("[JARVIS]", msg.text);
+    if (msg.text) {
+      console.log("[JARVIS]", msg.text);
+      if (typeof msg.text === "string") addChatMessage("assistant", msg.text);
+    }
   } else if (type === "status") {
     const state = msg.state as string;
     if (state === "thinking" && currentState !== "thinking") {
@@ -137,6 +247,10 @@ socket.onMessage((msg) => {
   } else if (type === "text") {
     // Text fallback when TTS fails
     console.log("[JARVIS]", msg.text);
+    if (typeof msg.text === "string") {
+      addChatMessage("assistant", msg.text);
+      speakTextFallback(msg.text);
+    }
   } else if (type === "task_spawned") {
     console.log("[task]", "spawned:", msg.task_id, msg.prompt);
   } else if (type === "task_complete") {
@@ -164,6 +278,9 @@ function ensureAudioContext() {
 document.addEventListener("click", ensureAudioContext);
 document.addEventListener("touchstart", ensureAudioContext);
 document.addEventListener("keydown", ensureAudioContext, { once: true });
+document.addEventListener("click", unlockSpeechOutput, { once: true });
+document.addEventListener("touchstart", unlockSpeechOutput, { once: true });
+document.addEventListener("keydown", unlockSpeechOutput, { once: true });
 
 // Try to resume audio context on load
 ensureAudioContext();
@@ -175,6 +292,7 @@ ensureAudioContext();
 const btnMute = document.getElementById("btn-mute")!;
 const btnMenu = document.getElementById("btn-menu")!;
 const menuDropdown = document.getElementById("menu-dropdown")!;
+const btnTestVoice = document.getElementById("btn-test-voice")!;
 const btnRestart = document.getElementById("btn-restart")!;
 const btnFixSelf = document.getElementById("btn-fix-self")!;
 
@@ -198,6 +316,13 @@ btnMenu.addEventListener("click", (e) => {
 
 document.addEventListener("click", () => {
   menuDropdown.style.display = "none";
+});
+
+btnTestVoice.addEventListener("click", (e) => {
+  e.stopPropagation();
+  menuDropdown.style.display = "none";
+  unlockSpeechOutput();
+  speakTextFallback("Voice test is working, sir.");
 });
 
 btnRestart.addEventListener("click", async (e) => {

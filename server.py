@@ -10,8 +10,8 @@ Handles:
 
 import asyncio
 import base64
-import base64
 import httpx
+import json
 import logging
 import os
 import sys
@@ -30,9 +30,7 @@ import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
-from pathlib import Path
 from typing import Optional
-import httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -1065,34 +1063,37 @@ app.add_middleware(
 )
 
 # ---------------------------------------------------------------------------
-# Speech-to-Text (Fish Audio API)
+# Speech-to-Text
 # ---------------------------------------------------------------------------
 
-from fastapi import File, UploadFile
 @app.post("/api/speech-to-text")
-async def api_speech_to_text(file: UploadFile = File(...)):
-    """Accepts an audio file and returns the transcript using Fish Audio API."""
+async def api_speech_to_text(audio: UploadFile | None = File(None), file: UploadFile | None = File(None)):
+    """Accepts an audio file and returns a transcript using Fish Audio STT."""
+    upload = audio or file
+    if not upload:
+        return JSONResponse(status_code=400, content={"error": "No audio file provided (expected 'audio' or 'file')"})
+
     if not FISH_API_KEY:
         return JSONResponse(status_code=500, content={"error": "Fish Audio API key not set"})
+
     try:
-        audio_bytes = await file.read()
-        headers = {
-            "Authorization": f"Bearer {FISH_API_KEY}",
-        }
-        files = {
-            "file": (file.filename, audio_bytes, file.content_type or "audio/wav"),
-        }
-        # Use default model/language
+        audio_bytes = await upload.read()
+        content_type = upload.content_type or "audio/webm"
+
+        headers = {"Authorization": f"Bearer {FISH_API_KEY}"}
+        files = {"file": (upload.filename or "speech.webm", audio_bytes, content_type)}
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post("https://api.fish.audio/v1/stt", headers=headers, files=files)
             if resp.status_code == 200:
                 data = resp.json()
-                return {"transcript": data.get("text", "")}
-            else:
-                return JSONResponse(status_code=502, content={"error": f"Fish Audio error: {resp.text}"})
+                transcript = data.get("text", "")
+                return {"transcript": transcript, "text": transcript}
+
+            return JSONResponse(status_code=502, content={"error": f"Fish Audio error: {resp.text}"})
     except Exception as e:
         log.error(f"Speech-to-text failed: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 
 # -- REST Endpoints --------------------------------------------------------
@@ -1100,6 +1101,19 @@ async def api_speech_to_text(file: UploadFile = File(...)):
 @app.get("/api/health")
 async def health():
     return {"status": "online", "name": "JARVIS", "version": "0.1.0"}
+
+
+# --- Calendar/Task API ---
+from fastapi import Query
+
+@app.get("/api/tasks/by-date")
+async def api_tasks_by_date(date: str = Query(..., description="Date in YYYY-MM-DD format")):
+    """Return all tasks due on a specific date."""
+    try:
+        tasks = get_tasks_for_date(date)
+        return {"tasks": tasks}
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
 
 
 @app.get("/api/tts-test")
@@ -1651,8 +1665,7 @@ async def voice_handler(ws: WebSocket):
         while True:
             raw = await ws.receive_text()
             try:
-                # json is not defined, so just echo the raw message for now
-                msg = {"type": "unknown", "raw": raw}
+                msg = json.loads(raw)
             except Exception:
                 continue
 

@@ -1,3 +1,38 @@
+# --- Jarvis Production Status Report ---
+from requests import api
+
+
+@api.route('/jarvis/report')
+@login_required
+def jarvis_report():
+    project_id = request.args.get('project', projects[0]['id'])
+    project = next((p for p in projects if p['id'] == project_id), projects[0])
+    ceo_timeline = ceo_agent.get_timeline()
+    ceo_status_reports = ceo_agent.status_reports if hasattr(ceo_agent, 'status_reports') else {}
+    recommended_team = ceo_agent.recommend_team(project)
+    deadlines = ceo_agent.check_content_deadlines()
+    overdue = deadlines['overdue']
+    upcoming = deadlines['upcoming']
+    report = []
+    report.append(f"Production Status Report for Project: {project['name']}")
+    report.append(f"Team Assigned: {', '.join(recommended_team)}")
+    if overdue:
+        report.append(f"Overdue Content: {len(overdue)} items")
+        for item in overdue:
+            report.append(f"- {item['title']} (was due {item['due_date']})")
+    if upcoming:
+        report.append(f"Content Due Soon: {len(upcoming)} items")
+        for item in upcoming:
+            report.append(f"- {item['title']} (due {item['due_date']})")
+    if not overdue and not upcoming:
+        report.append("All content is on schedule.")
+    report.append("\nAgent Status Reports:")
+    for agent, status in ceo_status_reports.items():
+        report.append(f"- {agent}: {status}")
+    report.append("\nCEO Timeline:")
+    for event in ceo_timeline[-5:]:
+        report.append(f"- {event['date']}: {event['event']} [{event['status']}]")
+    return "<pre>" + "\n".join(report) + "</pre>"
 
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash, jsonify
 """
@@ -130,6 +165,33 @@ def login_required(f):
 @app.route('/')
 @login_required
 def index():
+        # Generate Jarvis production status report for dashboard
+        ceo_timeline = ceo_agent.get_timeline()
+        ceo_status_reports = ceo_agent.status_reports if hasattr(ceo_agent, 'status_reports') else {}
+        recommended_team = ceo_agent.recommend_team(project)
+        deadlines = ceo_agent.check_content_deadlines()
+        overdue = deadlines['overdue']
+        upcoming = deadlines['upcoming']
+        jarvis_report = []
+        jarvis_report.append(f"Production Status Report for Project: {project['name']}")
+        jarvis_report.append(f"Team Assigned: {', '.join(recommended_team)}")
+        if overdue:
+            jarvis_report.append(f"Overdue Content: {len(overdue)} items")
+            for item in overdue:
+                jarvis_report.append(f"- {item['title']} (was due {item['due_date']})")
+        if upcoming:
+            jarvis_report.append(f"Content Due Soon: {len(upcoming)} items")
+            for item in upcoming:
+                jarvis_report.append(f"- {item['title']} (due {item['due_date']})")
+        if not overdue and not upcoming:
+            jarvis_report.append("All content is on schedule.")
+        jarvis_report.append("\nAgent Status Reports:")
+        for agent, status in ceo_status_reports.items():
+            jarvis_report.append(f"- {agent}: {status}")
+        jarvis_report.append("\nCEO Timeline:")
+        for event in ceo_timeline[-5:]:
+            jarvis_report.append(f"- {event['date']}: {event['event']} [{event['status']}]")
+        jarvis_report_str = "\n".join(jarvis_report)
     project_id = request.args.get('project', projects[0]['id'])
     project = next((p for p in projects if p['id'] == project_id), projects[0])
 
@@ -180,7 +242,8 @@ def index():
         ceo_timeline=ceo_timeline,
         ceo_status_reports=ceo_status_reports,
         ceo_deadlines=deadlines,
-        ceo_team=recommended_team
+        ceo_team=recommended_team,
+        jarvis_report=jarvis_report_str
     )
 
 # Route to trigger CEO agent status check

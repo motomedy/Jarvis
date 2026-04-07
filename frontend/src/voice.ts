@@ -13,17 +13,21 @@ export interface VoiceInput {
   resume(): void;
 }
 
+export type SttSource = "chrome" | "backend";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const webkitSpeechRecognition: any;
 
 export function createVoiceInput(
   onTranscript: (text: string) => void,
-  onError: (msg: string) => void
+  onError: (msg: string) => void,
+  onSourceChange?: (source: SttSource) => void
 ): VoiceInput {
   // Try native speech recognition first
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const SR = (window as any).SpeechRecognition || (typeof webkitSpeechRecognition !== "undefined" ? webkitSpeechRecognition : null);
   if (SR) {
+    onSourceChange?.("chrome");
     const recognition = new SR();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -97,6 +101,7 @@ export function createVoiceInput(
   }
 
   // Fallback: backend-powered speech recognition using MediaRecorder
+  onSourceChange?.("backend");
   let mediaRecorder: MediaRecorder | null = null;
   let audioChunks: Blob[] = [];
   let shouldListen = false;

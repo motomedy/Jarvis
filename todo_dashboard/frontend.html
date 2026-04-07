@@ -25,6 +25,15 @@
 <body>
   <div class="container">
     <h1>To-Do Dashboard</h1>
+    <div id="statusSummary" style="background:#eaf6ff;padding:16px 20px 12px 20px;border-radius:8px;margin-bottom:24px;">
+      <h2 style="margin-top:0;">Project Status Summary</h2>
+      <ul style="padding-left:18px;">
+        <li><b>JARVIS</b>: Voice-first AI assistant for macOS. <br><i>Backend stable, frontend running, robust integrations. Next: expand integrations, enhance customization.</i></li>
+        <li><b>IOS APP</b>: Native iOS client for JARVIS. <br><i>Swift app, backend connectivity, needs UI/UX polish and new features.</i></li>
+        <li><b>STT / STT2</b>: Speech-to-text modules for voice command recognition. <br><i>Initial pipeline integrated, needs accuracy and multi-language improvements.</i></li>
+        <li><b>TIKTOK</b>: Workspace for TikTok API integration. <br><i>Scaffolded, ready for API implementation and analytics expansion.</i></li>
+      </ul>
+    </div>
     <form id="addForm">
       <input type="text" id="title" placeholder="Task title" required>
       <input type="text" id="description" placeholder="Description">
