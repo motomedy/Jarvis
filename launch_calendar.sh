@@ -1,6 +1,6 @@
 #!/bin/bash
 # launch_calendar.sh
-# This script launches the JARVIS calendar backend and frontend automatically.
+# This script launches the JARVIS backend and calendar frontend automatically.
 
 # Exit on error
 set -e
@@ -12,13 +12,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$SCRIPT_DIR"
 FRONTEND_DIR="$SCRIPT_DIR/frontend/calendar"
 
-# 1. Start backend (FastAPI)
+# 1. Start backend
 echo "Starting backend (FastAPI)..."
 cd "$BACKEND_DIR"
-if [ -d "Calendar/.venv" ]; then
-    source Calendar/.venv/bin/activate
+if [ -d ".venv" ]; then
+    source .venv/bin/activate
 fi
-nohup python -m uvicorn server:app --reload > backend.log 2>&1 &
+nohup python server.py > backend.log 2>&1 &
 BACKEND_PID=$!
 echo "Backend started with PID $BACKEND_PID. Logs: $BACKEND_DIR/backend.log"
 
@@ -34,6 +34,6 @@ FRONTEND_PID=$!
 echo "Frontend started with PID $FRONTEND_PID. Logs: $FRONTEND_DIR/frontend.log"
 
 echo "\nJARVIS Calendar app is launching!"
-echo "- Backend: http://127.0.0.1:8000/docs (API docs)"
-echo "- Frontend: http://localhost:5173/ (web app)"
+echo "- Backend: https://localhost:8340 (API + WebSocket)"
+echo "- Frontend: http://localhost:5181/ (calendar app, may auto-increment)"
 echo "To stop: kill $BACKEND_PID $FRONTEND_PID"

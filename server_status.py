@@ -12,8 +12,8 @@ import os
 
 BACKEND_PROCESS = "server.py"
 FRONTEND_PROCESS = "vite"
-BACKEND_URL = "https://localhost:8340/api/health"
-FRONTEND_URL = "http://localhost:5173"
+BACKEND_URLS = ["https://localhost:8340/api/health", "http://localhost:8340/api/health"]
+FRONTEND_URLS = ["http://localhost:5180", "http://localhost:5173"]
 RESTART_LOG = "server_restart.log"
 MAX_RESTART_ATTEMPTS = 3
 
@@ -31,6 +31,12 @@ def check_url(url):
         return resp.status_code == 200
     except Exception:
         return False
+
+def first_responsive(urls):
+    for url in urls:
+        if check_url(url):
+            return url
+    return None
 
 def restart_backend():
     # Try to start backend using launchctl
@@ -63,10 +69,16 @@ def main():
     frontend_running = check_process(FRONTEND_PROCESS)
     print(f"Backend (server.py): {'RUNNING' if backend_running else 'NOT RUNNING'}")
     print(f"Frontend (Vite): {'RUNNING' if frontend_running else 'NOT RUNNING'}")
-    backend_ok = check_url(BACKEND_URL) if backend_running else False
-    frontend_ok = check_url(FRONTEND_URL) if frontend_running else False
+    backend_live_url = first_responsive(BACKEND_URLS) if backend_running else None
+    frontend_live_url = first_responsive(FRONTEND_URLS) if frontend_running else None
+    backend_ok = backend_live_url is not None
+    frontend_ok = frontend_live_url is not None
     print(f"Backend API: {'RESPONSIVE' if backend_ok else 'NO RESPONSE'}")
     print(f"Frontend UI: {'RESPONSIVE' if frontend_ok else 'NO RESPONSE'}")
+    if backend_live_url:
+        print(f"Backend URL: {backend_live_url}")
+    if frontend_live_url:
+        print(f"Frontend URL: {frontend_live_url}")
 
     # Auto-restart logic
     if not backend_running:

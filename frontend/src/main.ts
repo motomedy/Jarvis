@@ -116,13 +116,8 @@ if ("speechSynthesis" in window) {
 }
 
 function updateSttSource(source: SttSource) {
-  if (source === "chrome") {
-    sttSourceEl.textContent = "stt: chrome";
-    sttSourceEl.classList.remove("stt-backend");
-  } else {
-    sttSourceEl.textContent = "stt: backend";
-    sttSourceEl.classList.add("stt-backend");
-  }
+  sttSourceEl.textContent = "stt: chrome";
+  sttSourceEl.classList.remove("stt-backend");
 }
 
 function showError(msg: string) {
