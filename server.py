@@ -17,14 +17,21 @@ import sys
 import time
 from pathlib import Path
 
-# Load .env file if present
-_env_path = Path(__file__).parent / ".env"
-if _env_path.exists():
-    for _line in _env_path.read_text().splitlines():
+# Load .env-style files if present.
+def _load_env_file(env_path: Path) -> None:
+    if not env_path.exists():
+        return
+
+    for _line in env_path.read_text().splitlines():
         _line = _line.strip()
         if _line and not _line.startswith("#") and "=" in _line:
             _k, _, _v = _line.partition("=")
             os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+
+
+_root_path = Path(__file__).parent
+_load_env_file(_root_path / ".env")
+_load_env_file(_root_path / "ports.env")
 import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field, asdict

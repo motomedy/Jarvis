@@ -76,10 +76,12 @@ python server.py
 cd frontend && npm run dev
 
 # 8. Open Chrome
-open http://localhost:5173
+open http://localhost:5180
 ```
 
 Click the page once to enable audio, then speak. JARVIS will respond.
+
+Runtime ports are standardized in `ports.env`. Update that file if you need to remap services.
 
 ## Auto-Start After Restart (macOS)
 
@@ -90,9 +92,10 @@ chmod +x scripts/install_autostart.sh
 ./scripts/install_autostart.sh
 ```
 
-This installs two LaunchAgents:
+This installs LaunchAgents for JARVIS and PM2-managed services:
 - `com.jarvis.backend`
 - `com.jarvis.frontend`
+- `com.jarvis.pm2` (restores PM2 apps such as calendar frontend on 5181 and TikTok backend on 5001)
 
 Logs are written to `logs/launchd/`.
 

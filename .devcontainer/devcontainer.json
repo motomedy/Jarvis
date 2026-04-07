@@ -1,8 +1,8 @@
 {
   "name": "Jarvis",
-  "forwardPorts": [5173, 8340],
+  "forwardPorts": [5180, 8340],
   "portsAttributes": {
-    "5173": {
+    "5180": {
       "label": "Frontend (Vite)",
       "onAutoForward": "openBrowser"
     },

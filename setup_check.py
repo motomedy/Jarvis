@@ -20,6 +20,7 @@ REQUIRED_FILES = [
 LAUNCH_AGENTS = [
     os.path.expanduser("~/Library/LaunchAgents/com.jarvis.backend.plist"),
     os.path.expanduser("~/Library/LaunchAgents/com.jarvis.frontend.plist"),
+    os.path.expanduser("~/Library/LaunchAgents/com.jarvis.pm2.plist"),
 ]
 
 

@@ -7,7 +7,7 @@ JARVIS (Just A Rather Very Intelligent System) is a voice-first AI assistant. It
 Open this repo in a dev container — everything is automatic:
 1. `setup.sh` runs once on first open: installs deps, Ollama, and pulls the LLM model
 2. `start.sh` runs on every container start: launches Ollama, backend, and frontend
-3. Port 5173 auto-forwards and opens in your browser
+3. Port 5180 auto-forwards and opens in your browser
 4. Speak to JARVIS
 
 **Optional:** Edit `.env` to add a Fish Audio API key for voice TTS.

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TikTok Project Dashboard</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#060b16; color:#e5e7eb; margin:0; }
+      .wrap { max-width:1000px; margin:0 auto; padding:20px; }
+      .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+      .card { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:14px; margin-top:14px; }
+      .chips { display:flex; gap:8px; flex-wrap:wrap; }
+      .chip { background:#1f2937; padding:6px 10px; border-radius:999px; font-size:.85rem; }
+      ul { margin:0; padding-left:18px; }
+      .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+      form.inline { display:flex; gap:8px; margin-top:10px; }
+      input, textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #374151; background:#0f172a; color:#e5e7eb; }
+      button { padding:10px 12px; border:0; border-radius:8px; background:#2563eb; color:#fff; cursor:pointer; }
+      h1 { margin:0; }
+      h2 { margin-top:0; }
+      .subtitle { color:#9ca3af; }
+      .logout-link { color:#93c5fd; }
+      .pre-text { white-space:pre-wrap; margin:0; color:#cbd5e1; }
+      .ideas-list { margin-top:12px; }
+      @media (max-width: 800px) { .row { grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="top card">
+        <div>
+          <h1>TikTok Dashboard</h1>
+          <div class="subtitle">Current project: {{ current_project.name if current_project else 'N/A' }}</div>
+        </div>
+        <div>
+          <a href="/logout" class="logout-link">Logout</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 style="margin-top:0">Team</h2>
+        <div class="chips">
+          {% for member in ceo_team %}<span class="chip">{{ member }}</span>{% endfor %}
+        </div>
+      </section>
+
+      <section class="row">
+        <article class="card">
+          <h2>Video Ideas</h2>
+          <form class="inline" method="post" action="/add">
+            <input name="idea" placeholder="New idea" />
+            <button type="submit">Add</button>
+          </form>
+          <ul class="ideas-list">
+            {% for idea in video_ideas %}
+              <li>{{ idea }}</li>
+            {% else %}
+              <li>No ideas yet.</li>
+            {% endfor %}
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Jarvis Report</h2>
+          <pre class="pre-text">{{ jarvis_report }}</pre>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

@@ -8,14 +8,17 @@ PORTS_FILE="$ROOT_DIR/ports.env"
 
 BACKEND_LABEL="com.jarvis.backend"
 FRONTEND_LABEL="com.jarvis.frontend"
+PM2_LABEL="com.jarvis.pm2"
 LEGACY_LABEL="com.jarvis.server"
 
 BACKEND_PLIST="$LAUNCH_AGENTS_DIR/$BACKEND_LABEL.plist"
 FRONTEND_PLIST="$LAUNCH_AGENTS_DIR/$FRONTEND_LABEL.plist"
+PM2_PLIST="$LAUNCH_AGENTS_DIR/$PM2_LABEL.plist"
 LEGACY_PLIST="$LAUNCH_AGENTS_DIR/$LEGACY_LABEL.plist"
 
 PYTHON_BIN="$ROOT_DIR/.venv/bin/python"
 NPM_BIN="$(command -v npm || true)"
+PM2_BIN="$(command -v pm2 || true)"
 PYTHON_REAL_BIN="$($PYTHON_BIN -c 'import os, sys; print(os.path.realpath(sys.executable))' 2>/dev/null || true)"
 PYTHON_SITE_PACKAGES="$($PYTHON_BIN -c 'import site; print(site.getsitepackages()[0])' 2>/dev/null || true)"
 
@@ -159,37 +162,109 @@ cat > "$FRONTEND_PLIST" <<PLIST
 </plist>
 PLIST
 
+if [[ -n "$PM2_BIN" ]]; then
+  PM2_TARGET_APPS="calendar-backend,calendar-frontend,todo-backend,tiktok-backend"
+
+  "$PM2_BIN" start "$ROOT_DIR/ecosystem.config.js" --only "$PM2_TARGET_APPS" >/dev/null 2>&1 || true
+  "$PM2_BIN" save --force >/dev/null 2>&1 || true
+
+  cat > "$PM2_PLIST" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$PM2_LABEL</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>$PM2_BIN</string>
+    <string>resurrect</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>$HOME</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>$HOME</string>
+    <key>PATH</key>
+    <string>$PATH_VALUE</string>
+    <key>PM2_HOME</key>
+    <string>$HOME/.pm2</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>$LOG_DIR/pm2.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>$LOG_DIR/pm2.err.log</string>
+</dict>
+</plist>
+PLIST
+fi
+
 USER_DOMAIN="gui/$(id -u)"
 
 launchctl bootout "$USER_DOMAIN/$LEGACY_LABEL" >/dev/null 2>&1 || true
 launchctl bootout "$USER_DOMAIN/$BACKEND_LABEL" >/dev/null 2>&1 || true
 launchctl bootout "$USER_DOMAIN/$FRONTEND_LABEL" >/dev/null 2>&1 || true
+launchctl bootout "$USER_DOMAIN/$PM2_LABEL" >/dev/null 2>&1 || true
 launchctl unload "$LEGACY_PLIST" >/dev/null 2>&1 || true
 launchctl unload "$BACKEND_PLIST" >/dev/null 2>&1 || true
 launchctl unload "$FRONTEND_PLIST" >/dev/null 2>&1 || true
+launchctl unload "$PM2_PLIST" >/dev/null 2>&1 || true
 
 rm -f "$LEGACY_PLIST"
 
 launchctl bootstrap "$USER_DOMAIN" "$BACKEND_PLIST" >/dev/null 2>&1 || launchctl load "$BACKEND_PLIST"
 launchctl bootstrap "$USER_DOMAIN" "$FRONTEND_PLIST" >/dev/null 2>&1 || launchctl load "$FRONTEND_PLIST"
+if [[ -n "$PM2_BIN" && -f "$PM2_PLIST" ]]; then
+  launchctl bootstrap "$USER_DOMAIN" "$PM2_PLIST" >/dev/null 2>&1 || launchctl load "$PM2_PLIST"
+fi
 
 launchctl enable "$USER_DOMAIN/$BACKEND_LABEL" >/dev/null 2>&1 || true
 launchctl enable "$USER_DOMAIN/$FRONTEND_LABEL" >/dev/null 2>&1 || true
+if [[ -n "$PM2_BIN" && -f "$PM2_PLIST" ]]; then
+  launchctl enable "$USER_DOMAIN/$PM2_LABEL" >/dev/null 2>&1 || true
+fi
 
 launchctl kickstart -k "$USER_DOMAIN/$BACKEND_LABEL" >/dev/null 2>&1 || launchctl kickstart -k "$BACKEND_LABEL"
 launchctl kickstart -k "$USER_DOMAIN/$FRONTEND_LABEL" >/dev/null 2>&1 || launchctl kickstart -k "$FRONTEND_LABEL"
+if [[ -n "$PM2_BIN" && -f "$PM2_PLIST" ]]; then
+  launchctl kickstart -k "$USER_DOMAIN/$PM2_LABEL" >/dev/null 2>&1 || launchctl kickstart -k "$PM2_LABEL"
+fi
 
 echo "Installed and started LaunchAgents:"
 echo "- $BACKEND_LABEL"
 echo "- $FRONTEND_LABEL"
+if [[ -n "$PM2_BIN" && -f "$PM2_PLIST" ]]; then
+  echo "- $PM2_LABEL"
+else
+  echo "- PM2 LaunchAgent skipped (pm2 not found in PATH)"
+fi
 echo "Removed legacy LaunchAgent: $LEGACY_LABEL"
 echo
 echo "Check status:"
 echo "  launchctl print $USER_DOMAIN/$BACKEND_LABEL | head -n 40"
 echo "  launchctl print $USER_DOMAIN/$FRONTEND_LABEL | head -n 40"
+if [[ -n "$PM2_BIN" && -f "$PM2_PLIST" ]]; then
+  echo "  launchctl print $USER_DOMAIN/$PM2_LABEL | head -n 40"
+fi
 echo
 echo "Logs:"
 echo "  $LOG_DIR/backend.out.log"
 echo "  $LOG_DIR/backend.err.log"
 echo "  $LOG_DIR/frontend.out.log"
 echo "  $LOG_DIR/frontend.err.log"
+if [[ -n "$PM2_BIN" && -f "$PM2_PLIST" ]]; then
+  echo "  $LOG_DIR/pm2.out.log"
+  echo "  $LOG_DIR/pm2.err.log"
+fi

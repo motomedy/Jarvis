@@ -77,8 +77,8 @@ module.exports = {
     {
       name: 'calendar-frontend',
       script: 'npm',
-      args: `run dev --prefix frontend/calendar -- --host 0.0.0.0 --port ${ports.CALENDAR_FRONTEND_PORT}`,
-      cwd: './',
+      args: `run dev -- --host 0.0.0.0 --port ${ports.CALENDAR_FRONTEND_PORT}`,
+      cwd: './frontend/calendar',
       interpreter: 'none',
       env: {
         CALENDAR_BACKEND_PORT: ports.CALENDAR_BACKEND_PORT,
@@ -102,8 +102,8 @@ module.exports = {
     {
       name: 'tiktok-backend',
       script: './TIKTOK/venv/bin/python',
-      args: 'TIKTOK/dashboard.py',
-      cwd: './',
+      args: 'dashboard.py',
+      cwd: './TIKTOK',
       interpreter: 'none',
       env: {
         TIKTOK_BACKEND_PORT: ports.TIKTOK_BACKEND_PORT,

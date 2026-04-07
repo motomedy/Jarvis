@@ -303,4 +303,8 @@ def export_csv():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=int(os.environ.get('TIKTOK_BACKEND_PORT', '5001')))
+    app.run(
+        debug=True,
+        host=os.environ.get('TIKTOK_BACKEND_HOST', '0.0.0.0'),
+        port=int(os.environ.get('TIKTOK_BACKEND_PORT', '5001')),
+    )
