@@ -235,8 +235,6 @@
                 gap: 8px !important;
             }
         }
-        }
-        }
     </style>
 </head>
 <body>
@@ -254,6 +252,47 @@
                 {% else %}
                     <li>No status reports yet.</li>
                 {% endfor %}
+                </ul>
+                <div style="margin-top:10px;">
+                    <strong>CEO Recommended Team for this Project:</strong>
+                    <ul style="margin:0; padding-left:18px;">
+                    {% for agent in ceo_team %}
+                        <li>{{ agent }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div style="margin-top:10px;">
+                    <strong>SEO & Social Marketing Tools:</strong>
+                    <ul style="margin:0; padding-left:18px;">
+                        <li><strong>Search Engine Agent:</strong> Optimizes video metadata, suggests trending keywords.</li>
+                        <li><strong>Social Media Marketer Agent:</strong> Schedules and promotes videos across platforms.</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <strong>Content Deadlines:</strong>
+                <ul style="margin:0; padding-left:18px;">
+                {% if ceo_deadlines.overdue %}
+                    <li style="color:#ff6f3c; font-weight:bold;">Overdue:
+                        <ul style="margin:0; padding-left:18px;">
+                        {% for item in ceo_deadlines.overdue %}
+                            <li style="color:#ff6f3c;">{{ item.title }} (was due {{ item.due_date }})</li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if ceo_deadlines.upcoming %}
+                    <li style="color:#ffca3a; font-weight:bold;">Due Soon:
+                        <ul style="margin:0; padding-left:18px;">
+                        {% for item in ceo_deadlines.upcoming %}
+                            <li style="color:#ffca3a;">{{ item.title }} (due {{ item.due_date }})</li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if not ceo_deadlines.overdue and not ceo_deadlines.upcoming %}
+                    <li style="color:#6bcf63;">All content is on schedule.</li>
+                {% endif %}
                 </ul>
             </div>
             <div>
@@ -275,13 +314,13 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
         // Prepare data for the chart
-        const projectNames = {{ projects|map(attribute='name')|list|tojson }};
-        const ideasData = {{ projects|map(attribute='metrics')|map(attribute='ideas')|list|tojson }};
-        const videosData = {{ projects|map(attribute='metrics')|map(attribute='videos')|list|tojson }};
-        const engagementData = {{ projects|map(attribute='metrics')|map(attribute='engagement')|list|tojson }};
+        var projectNames = {{ projects|map(attribute='name')|list|tojson }};
+        var ideasData = {{ projects|map(attribute='metrics')|map(attribute='ideas')|list|tojson }};
+        var videosData = {{ projects|map(attribute='metrics')|map(attribute='videos')|list|tojson }};
+        var engagementData = {{ projects|map(attribute='metrics')|map(attribute='engagement')|list|tojson }};
 
-        const ctx = document.getElementById('projectMetricsChart').getContext('2d');
-        const projectMetricsChart = new Chart(ctx, {
+        var ctx = document.getElementById('projectMetricsChart').getContext('2d');
+        var projectMetricsChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: projectNames,
@@ -302,7 +341,7 @@
                     },
                     {
                         label: 'Engagement',
-                        data: engagementData.map(e => isNaN(e) ? 0 : e),
+                        data: engagementData.map(function(e) { return isNaN(e) ? 0 : e; }),
                         backgroundColor: 'rgba(255, 111, 60, 0.8)',
                         borderColor: 'rgba(255, 111, 60, 1)',
                         borderWidth: 1

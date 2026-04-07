@@ -12,6 +12,7 @@ from io import StringIO
 from dashboard_storage import load_ideas, save_ideas
 import tiktok_api_integration
 from projects_data import projects
+# CEO agent instance (singleton for demo)
 from agent_ceo_manager import CEOAgent, ExampleAgent
 # CEO agent instance (singleton for demo)
 ceo_agent = CEOAgent()
@@ -152,10 +153,24 @@ def index():
         video_ideas = []
         video_log = []
 
-    # CEO status/timeline for dashboard
+    # CEO content schedule enforcement
+    # Example: 30-day content plan for current project
+    import datetime
+    content_schedule = []
+    for i in range(30):
+        due_date = (datetime.datetime.now() + datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+        content_schedule.append({
+            'title': f"Day {i+1} Video",
+            'due_date': due_date,
+            'status': 'pending'
+        })
+    ceo_agent.set_content_schedule(content_schedule)
+    deadlines = ceo_agent.check_content_deadlines()
     ceo_timeline = ceo_agent.get_timeline()
     ceo_status_reports = ceo_agent.status_reports if hasattr(ceo_agent, 'status_reports') else {}
 
+    # CEO recommends team for the current project
+    recommended_team = ceo_agent.recommend_team(project)
     return render_template(
         'dashboard.html',
         projects=projects,
@@ -163,15 +178,18 @@ def index():
         video_ideas=video_ideas,
         video_log=video_log,
         ceo_timeline=ceo_timeline,
-        ceo_status_reports=ceo_status_reports
+        ceo_status_reports=ceo_status_reports,
+        ceo_deadlines=deadlines,
+        ceo_team=recommended_team
     )
 
 # Route to trigger CEO agent status check
 @app.route('/ceo/status_check')
 @login_required
 def ceo_status_check():
-    # In a real system, pass all real agent instances
-    agents = [ExampleAgent()]
+    # Add new agents for SEO and social marketing
+    from agent_ceo_manager import ExampleAgent, SearchEngineAgent, SocialMediaMarketerAgent
+    agents = [ExampleAgent(), SearchEngineAgent(), SocialMediaMarketerAgent()]
     ceo_agent.request_status_reports(agents)
     return redirect(url_for('index'))
 
