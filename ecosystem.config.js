@@ -20,9 +20,9 @@ module.exports = {
     },
     {
       name: 'calendar-backend',
-      script: './Calendar/.venv/bin/python',
-      args: '-m uvicorn calendar_reports:app --reload --port 8000',
-      cwd: './Calendar',
+      script: './.venv/bin/python',
+      args: '-m uvicorn calendar_reports:app --app-dir Calendar --reload --port 8000',
+      cwd: './',
       interpreter: 'none',
       autorestart: true,
       watch: false
