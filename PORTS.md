@@ -1,5 +1,7 @@
 # Project Port Map (Auto-Updated Reference)
 
+Standard runtime source of truth: `ports.env`
+
 | Project                | Type      | Port  | Config/Source Location                      |
 |------------------------|-----------|-------|---------------------------------------------|
 | JARVIS Main Frontend   | Frontend  | 5180  | frontend/vite.config.ts                     |

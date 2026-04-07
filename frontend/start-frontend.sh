@@ -1,6 +1,9 @@
 #!/bin/zsh
-# Wrapper script to launch Vite dev server with proper environment
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export HOME="/Users/ahmedmansi"
-cd /Users/ahmedmansi/Desktop/Jarvis/Jarvis/frontend
-exec npm run dev
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export HOME="$HOME"
+
+cd "$ROOT_DIR/frontend"
+exec npm run dev -- --host 0.0.0.0 --port 5180

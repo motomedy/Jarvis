@@ -71,6 +71,19 @@ FISH_API_URL = "https://api.fish.audio/v1/tts"
 USER_NAME = os.getenv("USER_NAME", "sir")
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.getenv(name, "").strip()
+    if not raw:
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        return default
+
+
+DEFAULT_SERVER_PORT = _env_int("JARVIS_BACKEND_PORT", 8340)
+
 DESKTOP_PATH = Path.home() / "Desktop"
 
 JARVIS_SYSTEM_PROMPT = """\
@@ -2055,7 +2068,7 @@ async def api_settings_status():
         "notes_accessible": notes_ok,
         "memory_count": memory_count,
         "task_count": task_count,
-        "server_port": 8340,
+        "server_port": DEFAULT_SERVER_PORT,
         "uptime_seconds": int(time.time() - _session_start),
         "env_keys_set": {
             "anthropic": bool(env_dict.get("ANTHROPIC_API_KEY", "").strip() and env_dict.get("ANTHROPIC_API_KEY", "") != "your-anthropic-api-key-here"),
@@ -2091,7 +2104,7 @@ async def api_restart():
     log.info("Restart requested — shutting down in 2 seconds")
     async def _restart():
         await asyncio.sleep(2)
-        cmd = [sys.executable, __file__, "--port", "8340", "--host", "0.0.0.0"]
+        cmd = [sys.executable, __file__, "--port", str(DEFAULT_SERVER_PORT), "--host", "0.0.0.0"]
         os.execv(sys.executable, cmd)
     asyncio.create_task(_restart())
     return {"status": "restarting"}
@@ -2143,7 +2156,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="JARVIS Server")
     parser.add_argument("--host", default="0.0.0.0", help="Bind host")
-    parser.add_argument("--port", type=int, default=8340, help="Bind port")
+    parser.add_argument("--port", type=int, default=DEFAULT_SERVER_PORT, help="Bind port")
     parser.add_argument("--reload", action="store_true", help="Auto-reload on changes")
     parser.add_argument("--ssl", action="store_true", help="Enable HTTPS with key.pem/cert.pem")
     args = parser.parse_args()

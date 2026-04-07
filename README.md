@@ -81,6 +81,21 @@ open http://localhost:5173
 
 Click the page once to enable audio, then speak. JARVIS will respond.
 
+## Auto-Start After Restart (macOS)
+
+To automatically start JARVIS backend and frontend after login/restart:
+
+```bash
+chmod +x scripts/install_autostart.sh
+./scripts/install_autostart.sh
+```
+
+This installs two LaunchAgents:
+- `com.jarvis.backend`
+- `com.jarvis.frontend`
+
+Logs are written to `logs/launchd/`.
+
 ## Configuration
 
 Edit your `.env` file:

@@ -112,6 +112,17 @@ def edit_event(event_id: int, event: Event):
     raise HTTPException(status_code=404, detail="Event not found")
 
 
+@app.delete("/api/events/{event_id}")
+def delete_event(event_id: int):
+    events = load_events()
+    for i, existing in enumerate(events):
+        if existing.id == event_id:
+            del events[i]
+            save_events(events)
+            return {"ok": True}
+    raise HTTPException(status_code=404, detail="Event not found")
+
+
 @app.get("/api/tasks", response_model=List[Task])
 def get_tasks():
     return load_tasks()
@@ -135,6 +146,17 @@ def edit_task(task_id: int, task: Task):
             tasks[i] = task
             save_tasks(tasks)
             return task
+    raise HTTPException(status_code=404, detail="Task not found")
+
+
+@app.delete("/api/tasks/{task_id}")
+def delete_task(task_id: int):
+    tasks = load_tasks()
+    for i, existing in enumerate(tasks):
+        if existing.id == task_id:
+            del tasks[i]
+            save_tasks(tasks)
+            return {"ok": True}
     raise HTTPException(status_code=404, detail="Task not found")
 
 
