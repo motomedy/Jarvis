@@ -1,0 +1,29 @@
+name: MissionControliOS
+options:
+  minimumXcodeGenVersion: 2.38.0
+  createIntermediateGroups: true
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.jarvis.missioncontrol
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+    SWIFT_VERSION: 5.0
+packages: {}
+targets:
+  MissionControliOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Core
+      - path: UI
+    resources:
+      - path: WebApp
+    info:
+      path: Info.plist
+    settings:
+      base:
+        PRODUCT_NAME: MissionControliOS
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: 1
+    scheme:
+      testTargets: []

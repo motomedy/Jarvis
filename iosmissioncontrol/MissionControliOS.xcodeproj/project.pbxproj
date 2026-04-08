@@ -1,0 +1,325 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1A5E5386FD6102A66F85B167 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0AB96C6E92EFB7ED957732 /* ContentView.swift */; };
+		4EFDA96AEE820B3003015446 /* MissionControlReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD170506F21CD6EA8F33F1A /* MissionControlReachability.swift */; };
+		B2919EA9C76E862DDDA01B3E /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142099BFA9C630DAA9E33ADD /* AppSettings.swift */; };
+		B5937D184E8B56915D241210 /* MissionControlWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508F8F04015613AC8004EEC5 /* MissionControlWebView.swift */; };
+		C64AA7C72DEF0F756AD94F8C /* MissionControliOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CF56B569C04555593CFE9B /* MissionControliOSApp.swift */; };
+		E968DBAA3479E45535150CF0 /* MissionControlStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795F74356BDACBFCE769AEDF /* MissionControlStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		142099BFA9C630DAA9E33ADD /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		38CF56B569C04555593CFE9B /* MissionControliOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionControliOSApp.swift; sourceTree = "<group>"; };
+		47EFA2C88075AD5E4CFA96FA /* MissionControliOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MissionControliOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		508F8F04015613AC8004EEC5 /* MissionControlWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionControlWebView.swift; sourceTree = "<group>"; };
+		795F74356BDACBFCE769AEDF /* MissionControlStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionControlStore.swift; sourceTree = "<group>"; };
+		9BD170506F21CD6EA8F33F1A /* MissionControlReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionControlReachability.swift; sourceTree = "<group>"; };
+		BF0AB96C6E92EFB7ED957732 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		34BD0AD94CADBA81E2A6E06C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				47EFA2C88075AD5E4CFA96FA /* MissionControliOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		352CE57BFDB8A7D1DF8712A6 = {
+			isa = PBXGroup;
+			children = (
+				E59ACD90EEB5597A2AB206FC /* App */,
+				F6A44B1ED0FE34CB570AA820 /* Core */,
+				911523F7DE66F366FBB1C25A /* UI */,
+				34BD0AD94CADBA81E2A6E06C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		911523F7DE66F366FBB1C25A /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				BF0AB96C6E92EFB7ED957732 /* ContentView.swift */,
+				508F8F04015613AC8004EEC5 /* MissionControlWebView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		E59ACD90EEB5597A2AB206FC /* App */ = {
+			isa = PBXGroup;
+			children = (
+				38CF56B569C04555593CFE9B /* MissionControliOSApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		F6A44B1ED0FE34CB570AA820 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				142099BFA9C630DAA9E33ADD /* AppSettings.swift */,
+				9BD170506F21CD6EA8F33F1A /* MissionControlReachability.swift */,
+				795F74356BDACBFCE769AEDF /* MissionControlStore.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F500E902A184AEBF0C6E20FD /* MissionControliOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3BC6E3D1CAB5AE302213036A /* Build configuration list for PBXNativeTarget "MissionControliOS" */;
+			buildPhases = (
+				E5626170D3CE8A9CED089BE3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MissionControliOS;
+			packageProductDependencies = (
+			);
+			productName = MissionControliOS;
+			productReference = 47EFA2C88075AD5E4CFA96FA /* MissionControliOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		15DB6AE13665F731FC7C939D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					F500E902A184AEBF0C6E20FD = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = C59BCD44BA4B463B0C7DE2B9 /* Build configuration list for PBXProject "MissionControliOS" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 352CE57BFDB8A7D1DF8712A6;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 34BD0AD94CADBA81E2A6E06C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F500E902A184AEBF0C6E20FD /* MissionControliOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E5626170D3CE8A9CED089BE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2919EA9C76E862DDDA01B3E /* AppSettings.swift in Sources */,
+				1A5E5386FD6102A66F85B167 /* ContentView.swift in Sources */,
+				4EFDA96AEE820B3003015446 /* MissionControlReachability.swift in Sources */,
+				E968DBAA3479E45535150CF0 /* MissionControlStore.swift in Sources */,
+				B5937D184E8B56915D241210 /* MissionControlWebView.swift in Sources */,
+				C64AA7C72DEF0F756AD94F8C /* MissionControliOSApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7C20C36073C769C0A033721B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J497Y8XJV6;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_NAME = MissionControliOS;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		91622DF92BC10745C32E0B23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarvis.missioncontrol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AE6AC3C3EFF5D1A3DC250785 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J497Y8XJV6;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_NAME = MissionControliOS;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		AF17410B48D8649AAE354A80 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarvis.missioncontrol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3BC6E3D1CAB5AE302213036A /* Build configuration list for PBXNativeTarget "MissionControliOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7C20C36073C769C0A033721B /* Debug */,
+				AE6AC3C3EFF5D1A3DC250785 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C59BCD44BA4B463B0C7DE2B9 /* Build configuration list for PBXProject "MissionControliOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF17410B48D8649AAE354A80 /* Debug */,
+				91622DF92BC10745C32E0B23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 15DB6AE13665F731FC7C939D /* Project object */;
+}

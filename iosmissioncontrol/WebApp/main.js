@@ -9,11 +9,6 @@ const memorySearchEl = document.getElementById("memory-search");
 const memoryResultsEl = document.getElementById("memory-results");
 const officeFloorEl = document.getElementById("office-floor");
 const teamStructureEl = document.getElementById("team-structure");
-const missionViewDotsEl = document.getElementById("mission-view-dots");
-const frontendStatusRowEl = document.getElementById("frontend-status-row");
-const frontendStatusLabelEl = document.getElementById("frontend-status-label");
-const backendStatusRowEl = document.getElementById("backend-status-row");
-const backendStatusLabelEl = document.getElementById("backend-status-label");
 
 const taskFormEl = document.getElementById("task-form");
 const taskTitleInputEl = document.getElementById("task-title");
@@ -47,7 +42,6 @@ const scheduleModalEl = document.getElementById("schedule-modal");
 const scheduleModalBackdropEl = document.getElementById("schedule-modal-backdrop");
 const scheduleModalCloseEl = document.getElementById("schedule-modal-close");
 const missionTabsEl = document.getElementById("mission-tabs");
-const missionContentEl = document.querySelector(".mission-content");
 const tabButtons = Array.from(document.querySelectorAll(".tab"));
 const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 const telemetryTasksEl = document.getElementById("telemetry-tasks");
@@ -59,17 +53,13 @@ const APP_STATE_KEY = "jarvis_calendar_board_v2";
 const APP_TAB_KEY = "jarvis_calendar_active_tab";
 const CHANNEL_NAME = "jarvis_task_pipeline_sync";
 const MAX_IMAGE_SIZE = 1_600_000;
-const SERVER_STATUS_REFRESH_MS = 20_000;
-const TAB_LABELS = {
-  schedule: "Schedule",
-  tasks: "Tasks",
-  pipeline: "Pipeline",
-  office: "Digital Office",
-  team: "Team Structure",
-  memory: "Memory",
-  activity: "Activity",
-  intel: "Intel",
-};
+
+const API_BASE = (() => {
+  if (typeof window !== "undefined" && typeof window.__MISSION_CONTROL_API_BASE__ === "string") {
+    return window.__MISSION_CONTROL_API_BASE__.replace(/\/$/, "");
+  }
+  return "";
+})();
 
 const TASK_STATUSES = ["todo", "in_progress", "blocked", "done"];
 const TASK_STATUS_LABELS = {
@@ -252,7 +242,7 @@ let eventsCount = 0;
 let reportsCount = 0;
 let memorySearchTerm = "";
 let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-let activeTab = "schedule";
+let activeTab = localStorage.getItem(APP_TAB_KEY) || "schedule";
 let selectedScheduleDateKey = toDateKey(new Date().toISOString());
 
 const nowIso = new Date().toISOString();
@@ -329,18 +319,6 @@ const defaultState = {
       createdAt: nowIso,
       updatedAt: nowIso,
     },
-      {
-        id: crypto.randomUUID(),
-        title: "Mission Control Complete!",
-        assignee: "Copilot",
-        kind: "scheduled",
-        status: "completed",
-        nextRunAt: new Date(2026, 3, 8, 12, 0, 0).toISOString(),
-        cronExpr: "",
-        notes: "Milestone: Mission Control is now complete, with all major features, navigation, animation, and reliability requests fulfilled and validated.",
-        createdAt: nowIso,
-        updatedAt: nowIso,
-      },
     {
       id: crypto.randomUUID(),
       title: "Daily mission status sync",
@@ -401,44 +379,6 @@ function updateSyncStatus(label) {
   updateSyncStatus._timer = setTimeout(() => {
     syncStatusEl.textContent = "Live sync active";
   }, 1500);
-}
-
-function updateStatusRow(rowEl, labelEl, status, message) {
-  if (!rowEl || !labelEl) {
-    return;
-  }
-
-  rowEl.classList.remove("checking", "online", "offline");
-  rowEl.classList.add(status);
-  labelEl.textContent = message;
-}
-
-function updateFrontendStatus() {
-  if (navigator.onLine) {
-    updateStatusRow(frontendStatusRowEl, frontendStatusLabelEl, "online", "Frontend: Online");
-    return;
-  }
-  updateStatusRow(frontendStatusRowEl, frontendStatusLabelEl, "offline", "Frontend: Offline");
-}
-
-async function checkBackendStatus() {
-  if (!navigator.onLine) {
-    updateStatusRow(backendStatusRowEl, backendStatusLabelEl, "offline", "Backend: Offline");
-    return;
-  }
-
-  updateStatusRow(backendStatusRowEl, backendStatusLabelEl, "checking", "Backend: Checking...");
-
-  try {
-    const response = await fetch("/api/events", { cache: "no-store" });
-    if (response.ok) {
-      updateStatusRow(backendStatusRowEl, backendStatusLabelEl, "online", "Backend: Online");
-      return;
-    }
-    updateStatusRow(backendStatusRowEl, backendStatusLabelEl, "offline", "Backend: Offline");
-  } catch {
-    updateStatusRow(backendStatusRowEl, backendStatusLabelEl, "offline", "Backend: Offline");
-  }
 }
 
 function normalizeState(parsed) {
@@ -528,16 +468,6 @@ function migrateState() {
       "",
       "Birthday"
     ) || touched;
-    touched =
-      ensureSchedule(
-        "Mission Control Complete!",
-        "Copilot",
-        "scheduled",
-        "completed",
-        new Date(2026, 3, 8, 12, 0, 0).toISOString(),
-        "",
-        "Milestone: Mission Control is now complete, with all major features, navigation, animation, and reliability requests fulfilled and validated."
-      ) || touched;
   touched =
     ensureSchedule(
       "Daily mission status sync",
@@ -754,7 +684,7 @@ function renderOffice() {
   TEAM_MEMBERS.forEach((member) => {
     const status = officeStatusFor(member.name);
     const card = document.createElement("article");
-    card.className = `office-card ${status.mood}`;
+    card.className = "office-card";
 
     const head = document.createElement("div");
     head.className = "office-head";
@@ -769,35 +699,20 @@ function renderOffice() {
     head.append(titleWrap, badge);
 
     const scene = document.createElement("div");
-    scene.className = `office-scene ${status.mood}`;
+    scene.className = "office-scene";
 
     const desk = document.createElement("div");
     desk.className = "desk";
 
     const computer = document.createElement("div");
-    computer.className = `computer ${status.mood}`;
+    computer.className = "computer";
 
-    const figure = document.createElement("div");
-    figure.className = `agent-figure ${status.mood}`;
-    figure.style.setProperty("--agent-color", member.color);
+    const avatar = document.createElement("div");
+    avatar.className = `agent-avatar ${status.mood === "working" ? "working" : ""}`.trim();
+    avatar.style.background = `linear-gradient(145deg, ${member.color}, #0f172a)`;
+    avatar.textContent = member.initials;
 
-    const torso = document.createElement("span");
-    torso.className = "figure-torso";
-    const headShape = document.createElement("span");
-    headShape.className = "figure-head";
-    const eyes = document.createElement("span");
-    eyes.className = "figure-eyes";
-    const leftArm = document.createElement("span");
-    leftArm.className = "figure-arm left";
-    const rightArm = document.createElement("span");
-    rightArm.className = "figure-arm right";
-    const badgeInitials = document.createElement("span");
-    badgeInitials.className = "figure-badge";
-    badgeInitials.textContent = member.initials;
-
-    figure.append(torso, headShape, eyes, leftArm, rightArm, badgeInitials);
-
-    scene.append(desk, computer, figure);
+    scene.append(desk, computer, avatar);
 
     const work = document.createElement("p");
     work.className = "office-work";
@@ -1315,9 +1230,7 @@ function renderScheduleCalendar() {
 
     const key = toDateKey(cellDate.toISOString());
     const count = counts[key] || 0;
-
     const birthdayItem = state.schedules.find((item) => toDateKey(item.nextRunAt) === key && /birthday/i.test(item.title));
-    const milestoneItem = state.schedules.find((item) => toDateKey(item.nextRunAt) === key && item.title === "Mission Control Complete!");
 
     const cell = document.createElement("div");
     cell.className = "calendar-day-cell";
@@ -1332,9 +1245,6 @@ function renderScheduleCalendar() {
     }
     if (birthdayItem) {
       cell.classList.add("birthday");
-    }
-    if (milestoneItem) {
-      cell.classList.add("milestone-schedule");
     }
 
     cell.addEventListener("click", () => {
@@ -1389,12 +1299,7 @@ function renderSelectedDayTasks() {
     const timeLabel = item.nextRunAt ? new Date(item.nextRunAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "No time";
     const kindLabel = SCHEDULE_KIND_LABELS[item.kind] || "Schedule";
     const statusLabel = SCHEDULE_STATUS_LABELS[item.status] || "Planned";
-    if (item.title === "Mission Control Complete!") {
-      li.className = "milestone-schedule";
-      li.innerHTML = `🎉 <strong style='color:#0ea5a3;'>${timeLabel} | ${item.title}</strong> | <span style='color:#f59e42;'>${kindLabel}</span> | <span style='color:#22c55e;'>${statusLabel}</span> <span style='background:#fffbe6;color:#b45309;padding:2px 8px;border-radius:8px;margin-left:8px;'>Milestone</span>`;
-    } else {
-      li.textContent = `${timeLabel} | ${item.title} | ${kindLabel} | ${statusLabel}`;
-    }
+    li.textContent = `${timeLabel} | ${item.title} | ${kindLabel} | ${statusLabel}`;
     scheduleDayListEl.appendChild(li);
   });
 }
@@ -1563,24 +1468,7 @@ function renderActivity() {
   renderList(activityFeedEl, state.activity, (entry) => entry);
 }
 
-function renderMissionViewReview() {
-  if (missionViewDotsEl) {
-    missionViewDotsEl.innerHTML = "";
-    tabButtons.forEach((button) => {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.setAttribute("aria-label", TAB_LABELS[button.dataset.tab] || "Mission section");
-      dot.setAttribute("title", TAB_LABELS[button.dataset.tab] || "Mission section");
-      dot.className = `mission-review-dot ${button.dataset.tab === activeTab ? "is-active" : ""}`.trim();
-      dot.addEventListener("click", () => {
-        setActiveTab(button.dataset.tab || "schedule");
-      });
-      missionViewDotsEl.appendChild(dot);
-    });
-  }
-}
-
-function setActiveTab(tabName, { scrollIntoPanel = true } = {}) {
+function setActiveTab(tabName) {
   const validTab = tabButtons.some((button) => button.dataset.tab === tabName) ? tabName : "schedule";
   activeTab = validTab;
 
@@ -1591,20 +1479,6 @@ function setActiveTab(tabName, { scrollIntoPanel = true } = {}) {
   tabPanels.forEach((panel) => {
     panel.classList.toggle("is-active", panel.dataset.tabPanel === activeTab);
   });
-
-  const activeButton = tabButtons.find((button) => button.dataset.tab === activeTab);
-  if (activeButton) {
-    activeButton.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  }
-
-  if (scrollIntoPanel) {
-    const activePanel = tabPanels.find((panel) => panel.dataset.tabPanel === activeTab);
-    if (activePanel) {
-      activePanel.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-    }
-  }
-
-  renderMissionViewReview();
 
   localStorage.setItem(APP_TAB_KEY, activeTab);
 }
@@ -1642,7 +1516,11 @@ async function readJsonArraySafe(response) {
 
 async function loadAll() {
   try {
-    const [eventsRes, reportsRes] = await Promise.all([fetch("/api/events"), fetch("/api/reports")]);
+    const [eventsRes, reportsRes] = await Promise.all([
+      fetch(`${API_BASE}/api/events`),
+      fetch(`${API_BASE}/api/reports`),
+    ]);
+
     const [events, reports] = await Promise.all([
       readJsonArraySafe(eventsRes),
       readJsonArraySafe(reportsRes),
@@ -1659,7 +1537,7 @@ async function loadAll() {
     reportsCount = 0;
     renderList(eventsEl, [], (e) => `${e.title} | ${e.start}`);
     renderList(reportsEl, [], (r) => `${r.project} | ${r.manager}`);
-    updateSyncStatus("Live intel is unavailable");
+    updateSyncStatus("Running local Mission Control bundle");
     renderStats();
   }
 }
@@ -1798,60 +1676,7 @@ if (missionTabsEl) {
     if (!button) {
       return;
     }
-    setActiveTab(button.dataset.tab || "schedule");
-  });
-}
-
-window.addEventListener("keydown", (event) => {
-  if (
-    event.target instanceof HTMLElement &&
-    ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)
-  ) {
-    return;
-  }
-
-  if (event.key === "ArrowLeft") {
-    const activeIndex = tabButtons.findIndex((button) => button.dataset.tab === activeTab);
-    if (activeIndex > 0) {
-      setActiveTab(tabButtons[activeIndex - 1].dataset.tab || "schedule");
-    }
-  }
-
-  if (event.key === "ArrowRight") {
-    const activeIndex = tabButtons.findIndex((button) => button.dataset.tab === activeTab);
-    if (activeIndex >= 0 && activeIndex < tabButtons.length - 1) {
-      setActiveTab(tabButtons[activeIndex + 1].dataset.tab || "schedule");
-    }
-  }
-});
-
-if (missionContentEl) {
-  const panelObserver = new IntersectionObserver(
-    (entries) => {
-      let nextPanel = null;
-
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-
-        if (!nextPanel || entry.intersectionRatio > nextPanel.intersectionRatio) {
-          nextPanel = entry;
-        }
-      });
-
-      if (nextPanel?.target?.dataset?.tabPanel) {
-        setActiveTab(nextPanel.target.dataset.tabPanel, { scrollIntoPanel: false });
-      }
-    },
-    {
-      root: missionContentEl,
-      threshold: [0.55, 0.7, 0.9],
-    }
-  );
-
-  tabPanels.forEach((panel) => {
-    panelObserver.observe(panel);
+    setActiveTab(button.dataset.tab || "tasks");
   });
 }
 
@@ -1884,24 +1709,6 @@ window.addEventListener("storage", (event) => {
 });
 
 renderEverything();
-setActiveTab(activeTab, { scrollIntoPanel: false });
-requestAnimationFrame(() => {
-  setActiveTab(activeTab);
-});
-updateFrontendStatus();
-checkBackendStatus();
-setInterval(checkBackendStatus, SERVER_STATUS_REFRESH_MS);
+setActiveTab(activeTab);
 
-window.addEventListener("online", () => {
-  updateFrontendStatus();
-  checkBackendStatus();
-});
-
-window.addEventListener("offline", () => {
-  updateFrontendStatus();
-  updateStatusRow(backendStatusRowEl, backendStatusLabelEl, "offline", "Backend: Offline");
-});
-
-loadAll().catch((err) => {
-  statsEl.innerHTML = `<article class="card"><div class="label">Error</div><div class="value">${err.message}</div></article>`;
-});
+loadAll();
