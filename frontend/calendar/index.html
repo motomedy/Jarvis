@@ -3,33 +3,196 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calendar Dashboard</title>
+    <title>Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Orbitron:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <main class="wrap">
-      <header>
-        <h1>Calendar Dashboard</h1>
-        <p>Live view for events, tasks, and reports.</p>
+      <header class="hero">
+        <h1>Mission Control</h1>
+        <p>Track every task, owner, and status in one live workspace.</p>
+        <div class="meta-row">
+          <span id="sync-status">Live sync active</span>
+        </div>
+        <div class="telemetry-strip" aria-label="Mission telemetry">
+          <span class="telemetry-item">TASKS <strong id="telemetry-tasks">0</strong></span>
+          <span class="telemetry-item">CONTENT <strong id="telemetry-content">0</strong></span>
+          <span class="telemetry-item">SCHEDULES <strong id="telemetry-schedules">0</strong></span>
+          <span class="telemetry-item">ACTIVE <strong id="telemetry-active">0</strong></span>
+        </div>
       </header>
 
-      <section class="cards" id="stats"></section>
-
-      <section class="panel">
-        <h2>Upcoming Events</h2>
-        <ul id="events"></ul>
+      <section class="mission-persistent">
+        <section class="cards" id="stats"></section>
+        <section class="panel mission-home-panel">
+          <h2>Mission Overview</h2>
+          <p class="panel-subtitle">Mission Control stays visible while you navigate every operational tab.</p>
+        </section>
       </section>
 
-      <section class="panel">
-        <h2>Open Tasks</h2>
-        <ul id="tasks"></ul>
+      <div class="mission-layout">
+        <aside class="panel sidebar">
+          <h2 class="sidebar-title">Mission Screens</h2>
+          <nav class="tabs" id="mission-tabs" aria-label="Mission control sections">
+            <button class="tab is-active" data-tab="schedule" type="button">Schedule</button>
+            <button class="tab" data-tab="tasks" type="button">Tasks</button>
+            <button class="tab" data-tab="pipeline" type="button">Pipeline</button>
+            <button class="tab" data-tab="office" type="button">Digital Office</button>
+            <button class="tab" data-tab="team" type="button">Team Structure</button>
+            <button class="tab" data-tab="memory" type="button">Memory</button>
+            <button class="tab" data-tab="activity" type="button">Activity</button>
+            <button class="tab" data-tab="intel" type="button">Intel</button>
+          </nav>
+        </aside>
+
+        <div class="mission-content">
+      <section class="tab-panel" data-tab-panel="tasks">
+        <section class="panel board-controls">
+          <h2>Add Task</h2>
+          <form id="task-form" class="task-form">
+            <input id="task-title" name="title" type="text" placeholder="What are we working on?" required maxlength="160" />
+            <select id="task-assignee" name="assignee">
+              <option value="Me">Me</option>
+              <option value="Copilot">Copilot</option>
+              <option value="Research Agent">Research Agent</option>
+              <option value="Content Agent">Content Agent</option>
+              <option value="Ops Agent">Ops Agent</option>
+              <option value="Analytics Agent">Analytics Agent</option>
+            </select>
+            <select id="task-status" name="status">
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="blocked">Blocked</option>
+              <option value="done">Done</option>
+            </select>
+            <button type="submit">Add Task</button>
+          </form>
+        </section>
+
+        <section class="board" id="task-board" aria-label="Task board columns"></section>
       </section>
 
-      <section class="panel">
-        <h2>Recent Reports</h2>
-        <ul id="reports"></ul>
+      <section class="tab-panel" data-tab-panel="pipeline">
+        <section class="panel pipeline-controls">
+          <h2>Content Pipeline</h2>
+          <p class="panel-subtitle">Create ideas, write full scripts, move content through every stage, and attach images.</p>
+          <form id="pipeline-form" class="pipeline-form">
+            <input id="pipeline-title" name="title" type="text" placeholder="Content title" required maxlength="180" />
+            <select id="pipeline-assignee" name="assignee">
+              <option value="Me">Me</option>
+              <option value="Copilot">Copilot</option>
+              <option value="Research Agent">Research Agent</option>
+              <option value="Content Agent">Content Agent</option>
+              <option value="Ops Agent">Ops Agent</option>
+              <option value="Analytics Agent">Analytics Agent</option>
+            </select>
+            <select id="pipeline-stage" name="stage">
+              <option value="idea_backlog">Idea Backlog</option>
+              <option value="research">Research</option>
+              <option value="outline">Outline</option>
+              <option value="scripting">Scripting</option>
+              <option value="production">Production</option>
+              <option value="editing">Editing</option>
+              <option value="qa_review">QA Review</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="published">Published</option>
+            </select>
+            <textarea id="pipeline-idea" name="idea" placeholder="Core idea and hooks" rows="3"></textarea>
+            <textarea id="pipeline-script" name="script" placeholder="Full script goes here" rows="6"></textarea>
+            <input id="pipeline-images" name="images" type="file" accept="image/*" multiple />
+            <button type="submit">Add Content Item</button>
+          </form>
+        </section>
+
+        <section class="pipeline-board" id="pipeline-board" aria-label="Content pipeline stages"></section>
       </section>
+
+      <section class="tab-panel" data-tab-panel="memory">
+        <section class="panel memory-screen">
+          <h2>Memory Mission Control</h2>
+          <p class="panel-subtitle">Searchable memory documents generated from our work history and pipeline knowledge.</p>
+          <div class="memory-controls">
+            <input
+              id="memory-search"
+              type="search"
+              placeholder="Search memories by keyword, title, script, or stage"
+              aria-label="Search memories"
+            />
+          </div>
+          <div id="memory-results" class="memory-results" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel is-active" data-tab-panel="schedule">
+        <section class="panel schedule-screen">
+          <h2>Mission Schedule Calendar</h2>
+          <p class="panel-subtitle">Calendar-only view for focused schedule oversight.</p>
+
+          <div class="calendar-shell">
+            <div class="calendar-head">
+              <button type="button" class="ghost" id="calendar-prev">Previous</button>
+              <h3 id="calendar-month-label">Month</h3>
+              <button type="button" class="ghost" id="calendar-next">Next</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid" aria-label="Mission calendar grid"></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="office">
+        <section class="panel office-screen">
+          <h2>Digital Office</h2>
+          <p class="panel-subtitle">Live view of each agent at their workstation with current status and active work.</p>
+          <div id="office-floor" class="office-floor" aria-label="Agent office floor"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="team">
+        <section class="panel team-structure-screen">
+          <h2>Team Structure</h2>
+          <p class="panel-subtitle">Copilot plus role-based subagents organized by responsibilities.</p>
+          <div id="team-structure" class="team-structure" aria-label="Team structure by role"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="activity">
+        <section class="panel">
+          <h2>Live Activity</h2>
+          <ul id="activity-feed"></ul>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="intel">
+        <section class="panel">
+          <h2>Upcoming Events</h2>
+          <ul id="events"></ul>
+        </section>
+
+        <section class="panel">
+          <h2>Recent Reports</h2>
+          <ul id="reports"></ul>
+        </section>
+      </section>
+        </div>
+      </div>
     </main>
+
+    <div class="schedule-modal" id="schedule-modal" aria-hidden="true">
+      <div class="schedule-modal-backdrop" id="schedule-modal-backdrop"></div>
+      <section class="schedule-modal-card" role="dialog" aria-modal="true" aria-labelledby="schedule-day-label">
+        <div class="schedule-modal-head">
+          <h3 id="schedule-day-label">Daily Schedules</h3>
+          <button type="button" class="ghost" id="schedule-modal-close">Close</button>
+        </div>
+        <ul id="schedule-day-list"></ul>
+      </section>
+    </div>
 
     <script type="module" src="/main.js"></script>
   </body>

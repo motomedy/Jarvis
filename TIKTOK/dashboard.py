@@ -20,7 +20,7 @@ ceo_agent = CEOAgent()
 app = Flask(__name__)
 app.secret_key = os.environ.get('DASHBOARD_SECRET_KEY', 'change_this_secret')
 
-TIKTOK_REDIRECT_URI = os.environ.get('TIKTOK_REDIRECT_URI', 'http://localhost:5000/tiktok/callback')
+TIKTOK_REDIRECT_URI = os.environ.get('TIKTOK_REDIRECT_URI', 'http://localhost:5001/tiktok/callback')
 TIKTOK_AUTH_STATE = 'tiktok_state_123'
 
 
