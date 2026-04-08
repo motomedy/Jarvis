@@ -343,6 +343,18 @@ const defaultState = {
       },
     {
       id: crypto.randomUUID(),
+      title: "iOS App Complete!",
+      assignee: "Copilot",
+      kind: "scheduled",
+      status: "completed",
+      nextRunAt: new Date(2026, 3, 8, 18, 0, 0).toISOString(),
+      cronExpr: "",
+      notes: "Milestone: iosmissioncontrol iPhone app is now complete, fully mobile-friendly, visually aligned with Mission Control web, and validated with a successful build and user test.",
+      createdAt: nowIso,
+      updatedAt: nowIso,
+    },
+    {
+      id: crypto.randomUUID(),
       title: "Daily mission status sync",
       assignee: "Copilot",
       kind: "cron",
@@ -538,6 +550,16 @@ function migrateState() {
         "",
         "Milestone: Mission Control is now complete, with all major features, navigation, animation, and reliability requests fulfilled and validated."
       ) || touched;
+      touched =
+        ensureSchedule(
+          "iOS App Complete!",
+          "Copilot",
+          "scheduled",
+          "completed",
+          new Date(2026, 3, 8, 18, 0, 0).toISOString(),
+          "",
+          "Milestone: iosmissioncontrol iPhone app is now complete, fully mobile-friendly, visually aligned with Mission Control web, and validated with a successful build and user test."
+        ) || touched;
   touched =
     ensureSchedule(
       "Daily mission status sync",
@@ -1317,7 +1339,10 @@ function renderScheduleCalendar() {
     const count = counts[key] || 0;
 
     const birthdayItem = state.schedules.find((item) => toDateKey(item.nextRunAt) === key && /birthday/i.test(item.title));
-    const milestoneItem = state.schedules.find((item) => toDateKey(item.nextRunAt) === key && item.title === "Mission Control Complete!");
+    const milestoneItem = state.schedules.find((item) => {
+      if (toDateKey(item.nextRunAt) !== key) return false;
+      return /milestone/i.test(item.notes || "") || /complete!$/i.test(item.title);
+    });
 
     const cell = document.createElement("div");
     cell.className = "calendar-day-cell";
@@ -1389,7 +1414,8 @@ function renderSelectedDayTasks() {
     const timeLabel = item.nextRunAt ? new Date(item.nextRunAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "No time";
     const kindLabel = SCHEDULE_KIND_LABELS[item.kind] || "Schedule";
     const statusLabel = SCHEDULE_STATUS_LABELS[item.status] || "Planned";
-    if (item.title === "Mission Control Complete!") {
+    const isMilestone = /milestone/i.test(item.notes || "") || /complete!$/i.test(item.title);
+    if (isMilestone) {
       li.className = "milestone-schedule";
       li.innerHTML = `🎉 <strong style='color:#0ea5a3;'>${timeLabel} | ${item.title}</strong> | <span style='color:#f59e42;'>${kindLabel}</span> | <span style='color:#22c55e;'>${statusLabel}</span> <span style='background:#fffbe6;color:#b45309;padding:2px 8px;border-radius:8px;margin-left:8px;'>Milestone</span>`;
     } else {
