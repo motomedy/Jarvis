@@ -33,9 +33,9 @@ JARVIS connects to your Apple Calendar, Mail, and Notes. It can browse the web, 
 - **Python 3.11+**
 - **Node.js 18+**
 - **Google Chrome** (required for Web Speech API)
-- **Anthropic API key** -- powers the AI brain ([get one here](https://console.anthropic.com/))
+- **OpenClaw API key** -- powers the AI brain ([get one here](https://openclaw.ai/))
 - **Fish Audio API key** -- powers the voice ([get one here](https://fish.audio/))
-- **Claude Code CLI** -- for spawning dev tasks ([install here](https://docs.anthropic.com/en/docs/claude-code))
+- **Claude Code CLI** -- for spawning dev tasks ([install here](https://docs.openclaw.ai/))
 
 ## Quick Start (with Claude Code)
 
@@ -105,7 +105,7 @@ Edit your `.env` file:
 
 ```env
 # Required
-ANTHROPIC_API_KEY=your-anthropic-api-key-here
+OPENCLAW_API_KEY=your-openclaw-api-key-here
 FISH_API_KEY=your-fish-audio-api-key-here
 
 # Optional -- your name (JARVIS will address you personally)
@@ -207,7 +207,7 @@ Free for personal, non-commercial use. Commercial use requires a license — vis
 
 Built by [Ethan](https://ethanplus.ai).
 
-Powered by [Anthropic Claude](https://anthropic.com) and [Fish Audio](https://fish.audio).
+Powered by [OpenClaw](https://openclaw.ai) and [Fish Audio](https://fish.audio).
 
 Inspired by the AI that started it all -- Tony Stark's JARVIS.
 

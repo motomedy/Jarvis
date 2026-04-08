@@ -2,7 +2,7 @@
 Test the LLM intent classifier with 20 sample voice command phrases.
 
 Run: python3 tests/test_classifier.py
-Requires: ANTHROPIC_API_KEY in .env or environment
+Requires: OPENCLAW_API_KEY in .env or environment
 """
 
 import asyncio
@@ -23,7 +23,7 @@ if env_path.exists():
             k, _, v = line.partition("=")
             os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
-import anthropic
+import openclaw
 
 # Import the classifier and speech corrections
 from server import classify_intent, apply_speech_corrections
@@ -62,12 +62,12 @@ TEST_CASES = [
 
 
 async def run_tests():
-    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    api_key = os.getenv("OPENCLAW_API_KEY", "")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
+        print("ERROR: OPENCLAW_API_KEY not set")
         sys.exit(1)
 
-    client = anthropic.AsyncAnthropic(api_key=api_key)
+    client = openclaw.AsyncOpenClaw(api_key=api_key)
 
     passed = 0
     failed = 0

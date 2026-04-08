@@ -151,16 +151,16 @@ async def take_screenshot(display_only: bool = True) -> str | None:
             pass
 
 
-async def describe_screen(anthropic_client) -> str:
+async def describe_screen(openclaw_client) -> str:
     """Describe what's on the user's screen.
 
     Tries screenshot + vision first. Falls back to window list + LLM summary.
     """
     # Try screenshot + vision
     screenshot_b64 = await take_screenshot()
-    if screenshot_b64 and anthropic_client:
+    if screenshot_b64 and openclaw_client:
         try:
-            response = await anthropic_client.messages.create(
+            response = await openclaw_client.messages.create(
                 model="claude-haiku-4-5-20251001",
                 max_tokens=300,
                 system=(
@@ -212,9 +212,9 @@ async def describe_screen(anthropic_client) -> str:
         if bg_apps:
             context_parts.append(f"Background apps: {', '.join(bg_apps)}")
 
-    if anthropic_client and context_parts:
+    if openclaw_client and context_parts:
         try:
-            response = await anthropic_client.messages.create(
+            response = await openclaw_client.messages.create(
                 model="claude-haiku-4-5-20251001",
                 max_tokens=100,
                 system=(

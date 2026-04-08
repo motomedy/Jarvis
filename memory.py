@@ -402,17 +402,17 @@ def format_plan_for_voice(tasks: list[dict], events: list[dict]) -> str:
 # Memory extraction — learn from conversations
 # ---------------------------------------------------------------------------
 
-async def extract_memories(user_text: str, jarvis_response: str, anthropic_client) -> list[str]:
+async def extract_memories(user_text: str, jarvis_response: str, openclaw_client) -> list[str]:
     """After a conversation turn, extract any facts worth remembering.
 
     Uses Haiku to decide if anything in the exchange is worth storing.
     Returns list of memories stored.
     """
-    if not anthropic_client or len(user_text) < 15:
+    if not openclaw_client or len(user_text) < 15:
         return []
 
     try:
-        response = await anthropic_client.messages.create(
+        response = await openclaw_client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=200,
             system=(

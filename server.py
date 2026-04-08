@@ -17,7 +17,7 @@ import sys
 import time
 from pathlib import Path
 
-# Load .env-style files if present.
+ # Load .env-style files if present.
 def _load_env_file(env_path: Path) -> None:
     if not env_path.exists():
         return
@@ -67,6 +67,7 @@ log = logging.getLogger("jarvis")
 # Config
 # ---------------------------------------------------------------------------
 
+
 OLLAMA_HOST  = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5")
 FISH_API_KEY = os.getenv("FISH_API_KEY", "")
@@ -74,6 +75,7 @@ FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "612b878b113047d9a770c069c8b4fdfe")  
 FISH_API_URL = "https://api.fish.audio/v1/tts"
 USER_NAME = os.getenv("USER_NAME", "sir")
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+OPENCLAW_API_KEY = os.getenv("OPENCLAW_API_KEY", "")
 
 
 def _env_int(name: str, default: int) -> int:
@@ -116,7 +118,7 @@ CONVERSATION STYLE:
 - When you don't know something: "I'm afraid I don't have that information, sir" not "I don't know"
 
 SELF-AWARENESS:
-You ARE the JARVIS project at {project_dir} on {user_name}'s computer. Your code is Python (FastAPI server, WebSocket voice, Fish Audio TTS, Anthropic API). You were built by {user_name}. If asked about yourself, your code, how you work, or your line count — use [ACTION:PROMPT_PROJECT] to check the jarvis project. You have full access to your own source code.
+You ARE the JARVIS project at {project_dir} on {user_name}'s computer. Your code is Python (FastAPI server, WebSocket voice, Fish Audio TTS, OpenClaw API). You were built by {user_name}. If asked about yourself, your code, how you work, or your line count — use [ACTION:PROMPT_PROJECT] to check the jarvis project. You have full access to your own source code.
 
 YOUR CAPABILITIES (these are REAL and ACTIVE — you CAN do all of these RIGHT NOW):
 - You CAN open Terminal.app via AppleScript
@@ -1064,7 +1066,7 @@ async def generate_response(
     last_response: str = "",
     session_summary: str = "",
 ) -> str:
-    """Generate a JARVIS response using Anthropic API."""
+    """Generate a JARVIS response using OpenClaw API."""
     now = datetime.now()
     current_time = now.strftime("%A, %B %d, %Y at %I:%M %p")
 
@@ -1191,7 +1193,7 @@ def _cost_from_tokens(input_t: int, output_t: int) -> float:
 
 
 def track_usage(response):
-    """Track token usage from an Anthropic API response."""
+    """Track token usage from an OpenClaw API response."""
     inp = getattr(response.usage, "input_tokens", 0) if hasattr(response, "usage") else 0
     out = getattr(response.usage, "output_tokens", 0) if hasattr(response, "usage") else 0
     _session_tokens["input"] += inp
@@ -2384,7 +2386,7 @@ class PreferencesUpdate(BaseModel):
 
 @app.post("/api/settings/keys")
 async def api_settings_keys(body: KeyUpdate):
-    allowed = {"ANTHROPIC_API_KEY", "FISH_API_KEY", "FISH_VOICE_ID", "USER_NAME", "HONORIFIC", "CALENDAR_ACCOUNTS"}
+    allowed = {"OPENCLAW_API_KEY", "FISH_API_KEY", "FISH_VOICE_ID", "USER_NAME", "HONORIFIC", "CALENDAR_ACCOUNTS"}
     if body.key_name not in allowed:
         return JSONResponse({"success": False, "error": "Invalid key name"}, status_code=400)
     _write_env_key(body.key_name, body.key_value)

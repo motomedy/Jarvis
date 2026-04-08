@@ -72,7 +72,7 @@ async def detect_planning_mode(
 
     Args:
         user_text: The raw user request.
-        client: Anthropic async client for Haiku classification.
+        client: OpenClaw async client for classification.
         force_bypass: If True, skip planning and apply smart defaults.
 
     Returns:
