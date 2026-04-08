@@ -50,6 +50,66 @@ const missionTabsEl = document.getElementById("mission-tabs");
 const missionContentEl = document.querySelector(".mission-content");
 const tabButtons = Array.from(document.querySelectorAll(".tab"));
 const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+
+// Swipe and keyboard navigation for tab panels
+const missionContent = document.querySelector('.mission-content.swipe-panels');
+let touchStartX = null;
+let touchEndX = null;
+
+function getActiveTabIndex() {
+  return tabButtons.findIndex(btn => btn.classList.contains('is-active'));
+}
+
+function activateTabByIndex(idx) {
+  if (idx < 0 || idx >= tabButtons.length) return;
+  tabButtons.forEach((btn, i) => btn.classList.toggle('is-active', i === idx));
+  tabPanels.forEach((panel, i) => panel.classList.toggle('is-active', i === idx));
+  // Scroll to the selected panel
+  if (missionContent) {
+    missionContent.scrollTo({ left: idx * missionContent.offsetWidth, behavior: 'smooth' });
+  }
+}
+
+if (missionContent) {
+  missionContent.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+    }
+  });
+  missionContent.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    touchEndX = e.changedTouches[0].clientX;
+    const dx = touchEndX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      const currentIdx = getActiveTabIndex();
+      if (dx < 0 && currentIdx < tabButtons.length - 1) {
+        activateTabByIndex(currentIdx + 1);
+      } else if (dx > 0 && currentIdx > 0) {
+        activateTabByIndex(currentIdx - 1);
+      }
+    }
+    touchStartX = null;
+    touchEndX = null;
+  });
+  // Keyboard navigation (left/right arrows)
+  missionContent.addEventListener('keydown', (e) => {
+    const currentIdx = getActiveTabIndex();
+    if (e.key === 'ArrowLeft' && currentIdx > 0) {
+      activateTabByIndex(currentIdx - 1);
+      e.preventDefault();
+    } else if (e.key === 'ArrowRight' && currentIdx < tabButtons.length - 1) {
+      activateTabByIndex(currentIdx + 1);
+      e.preventDefault();
+    }
+  });
+}
+
+// Tab button click handler
+tabButtons.forEach((btn, idx) => {
+  btn.addEventListener('click', () => {
+    activateTabByIndex(idx);
+  });
+});
 const telemetryTasksEl = document.getElementById("telemetry-tasks");
 const telemetryContentEl = document.getElementById("telemetry-content");
 const telemetrySchedulesEl = document.getElementById("telemetry-schedules");
@@ -816,6 +876,15 @@ function renderOffice() {
     const badgeInitials = document.createElement("span");
     badgeInitials.className = "figure-badge";
     badgeInitials.textContent = member.initials;
+
+    // Add coffee cup for idle status
+    let coffeeCup = null;
+    if (status.mood === "idle") {
+      coffeeCup = document.createElement("span");
+      coffeeCup.className = "figure-cup";
+      coffeeCup.title = "Coffee cup";
+      figure.append(coffeeCup);
+    }
 
     figure.append(torso, headShape, eyes, leftArm, rightArm, badgeInitials);
 

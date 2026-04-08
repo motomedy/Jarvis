@@ -37,8 +37,7 @@
       </section>
 
       <div class="mission-layout">
-        <div class="mission-tabs-reveal" id="mission-tabs-reveal" aria-hidden="true"></div>
-        <div class="mission-tabs-strip">
+        <div class="mission-tabs-strip sticky-tabs">
           <nav class="tabs" id="mission-tabs" aria-label="Mission control sections">
             <button class="tab is-active" data-tab="schedule" type="button">Schedule</button>
             <button class="tab" data-tab="tasks" type="button">Tasks</button>
@@ -51,7 +50,7 @@
           </nav>
         </div>
 
-        <div class="mission-content">
+        <div class="mission-content swipe-panels" tabindex="0" aria-label="Mission Control Panels">
       <section class="tab-panel is-active" data-tab-panel="schedule">
         <section class="panel schedule-screen">
           <h2>Mission Schedule Calendar</h2>
